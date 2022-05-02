@@ -1,3 +1,5 @@
+## [STATUS] Full documentation, code, and model release in progress! 
+
 # Cue: a deep learning framework for SV calling and genotyping
 
 
