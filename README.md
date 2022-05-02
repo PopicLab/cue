@@ -4,19 +4,21 @@
 
 #### Setup a Python virtual environment (recommended)
 
-1. Create the virtual environment (in the env directory): 
+1. ```git clone git@github.com:PopicLab/cue.git```
+
+2. Create the virtual environment (in the env directory): 
 ```$> python3.7 -m venv env```
 
-2. Activate the environment: 
+3. Activate the environment: 
 ```$> source env/bin/activate```
 
-3. Install all the required packages (in the virtual environment):
+4. Install all the required packages (in the virtual environment):
 ```$> pip --no-cache-dir install -r install/requirements.txt```
 
 ### Execution
 
 Prior to running the code, setup a Python virtual environment (as described below) 
-and set the PYTHONPATH as follows: ```export PYTHONPATH=${PYTHONPATH}:${PATH_TO_REPO}```
+and set the ```PYTHONPATH``` as follows: ```export PYTHONPATH=${PYTHONPATH}:${PATH_TO_REPO}```
 
 The ```engine``` directory contains the following key scripts to train/evaluate the model 
 and generate image datasets:
