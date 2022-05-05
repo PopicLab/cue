@@ -78,7 +78,7 @@ for epoch in range(config.num_epochs):
     engine.train(model, optimizer, data_loaders[PHASES.TRAIN], config, epoch, collect_data_metrics=(epoch == 0))
     torch.save(model.state_dict(), "%s.epoch%d" % (config.model_path, epoch))
     engine.evaluate(model, data_loaders[PHASES.VALIDATE], config, config.device, config.epoch_dirs[epoch],
-                    streaming=streaming, collect_data_metrics=(epoch == 0), given_ground_truth=True, filters=False)
+                    collect_data_metrics=(epoch == 0), given_ground_truth=True, filters=False)
     lr_scheduler.step()
 
 torch.save(model.state_dict(), config.model_path)
