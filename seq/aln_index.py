@@ -57,8 +57,6 @@ class AlnIndex:
                     # soft (op 4) or hard clipped (op 5)
                     # TODO(viq): expose min clipped length param
                     self.bins[signal][self.tid][bin_id] += 1
-            elif signal == SVSignals.RD_LR and rp_type != constants.SV_SIGNAL_RP_TYPE.LR:
-                self.bins[signal][self.tid][bin_id] += 1
             else:
                 self.bins[signal][self.tid][bin_id] += 1
         else:
