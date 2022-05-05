@@ -1,22 +1,28 @@
-# cue: a deep learning framework for SV calling and genotyping
+## [STATUS] Full documentation, code, and model release in progress! 
+
+# Cue: a deep learning framework for SV calling and genotyping
+
 
 ### Installation
 
+Clone the repository:
+```git clone git@github.com:PopicLab/cue.git```
+
 #### Setup a Python virtual environment (recommended)
 
-1. Create the virtual environment (in the env directory): 
+2. Create the virtual environment (in the env directory): 
 ```$> python3.7 -m venv env```
 
-2. Activate the environment: 
+3. Activate the environment: 
 ```$> source env/bin/activate```
 
-3. Install all the required packages (in the virtual environment):
+4. Install all the required packages (in the virtual environment):
 ```$> pip --no-cache-dir install -r install/requirements.txt```
 
 ### Execution
 
 Prior to running the code, setup a Python virtual environment (as described below) 
-and set the PYTHONPATH as follows: ```export PYTHONPATH=${PYTHONPATH}:${PATH_TO_REPO}```
+and set the ```PYTHONPATH``` as follows: ```export PYTHONPATH=${PYTHONPATH}:/path/to/cue```
 
 The ```engine``` directory contains the following key scripts to train/evaluate the model 
 and generate image datasets:
@@ -33,10 +39,10 @@ Each script accepts as input one or multiple YAML config files,
 which encode a variety of parameters. Template config files are provided 
 in the ```config``` directory.
 
-The recommended workflow for launching a new experiment:
-1. Create a new folder under the ```experiments``` directory or an internal subdirectory.
-2. Place YAML config file(s) in this folder (either copying the template or a previous config).
-3. Populate the YAML config files with the parameters specific to this experiment.
+### Recommended workflow 
+
+1. Create a new directory.
+2. Place YAML config file(s) in this directory (see the provided templates).
+3. Populate the YAML config file(s) with the parameters specific to this experiment.
 4. Execute the appropriate ```engine``` script providing the path to the newly configured YAML file(s).
-The engine scripts will automatically create auxiliary directories with results in the experiments folder 
-where the config YAML files are located.
+The engine scripts will automatically create auxiliary directories with results in the folder where the config YAML files are located.
