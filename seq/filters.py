@@ -17,7 +17,7 @@ def filter_by_region(sv_candidates, blacklist_bed):
         if not blacklist.overlaps(sv):
             results.append(sv)
         else:
-            logging.info("FILTER blacklist: %s" % sv)
+            logging.debug("FILTER blacklist: %s" % sv)
     return results
 
 def nms1D(sv_candidates):
@@ -30,7 +30,7 @@ def nms1D(sv_candidates):
             sv_tree.add(sv)
             results.append(sv)
         else:
-            logging.info("FILTER nms1D: %s" % sv)
+            logging.debug("FILTER nms1D: %s" % sv)
     # TODO: record near duplicates (graph -> connected components)
     #       select consensus locations
     #       update confidence score based on consensus
@@ -45,7 +45,7 @@ def remove_filtered_dups(sv_candidates, filtered_candidates):
         if not sv_tree.overlaps(sv):
             results.append(sv)
         else:
-            logging.info("FILTER filtered-dups: %s" % sv)
+            logging.debug("FILTER filtered-dups: %s" % sv)
     return results
 
 

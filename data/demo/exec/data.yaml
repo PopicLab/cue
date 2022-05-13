@@ -1,0 +1,20 @@
+bam: "data/demo/inputs/chr21.small.bam"
+fai: "data/demo/inputs/GRCh38.fa.fai"
+bed: null
+blacklist_bed: null 
+bam_type: "SHORT"
+signal_set: "SHORT"
+signal_set_origin: "SHORT"
+signal_vmax: {"RD": 600, "RD_LOW": 800, "RD_CLIPPED": 600, "SM": 200, "SR_RP": 600, "LR": 600, "LLRR": 100, "RL": 100, "LLRR_VS_LR": 1}
+signal_mapq: {"RD": 20, "RD_LOW": 0, "RD_CLIPPED": 20, "SM": 20, "SR_RP": 0, "LR": 0, "LLRR": 1, "RL": 1, "LLRR_VS_LR": 1}
+bin_size: 750
+interval_size: [150000]
+step_size: [50000]
+shift_size: [0, 70000, 140000]
+heatmap_dim: 1000
+image_dim: 256
+class_set: "BASIC5ZYG"
+num_keypoints: 1
+bbox_padding: 0
+n_cpus: 1
+chr_names: ["chr21"]

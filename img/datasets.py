@@ -1,3 +1,26 @@
+# MIT License
+#
+# Copyright (c) 2022 Victoria Popic
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+
 import time
 from torch.utils.data import Dataset, IterableDataset
 import matplotlib.image as img
@@ -152,14 +175,19 @@ class SVStreamingDataset(IterableDataset):
                         nbr_counts = convolve(llrr_counts, kernel, mode='constant')
                         counts = (llrr_counts + nbr_counts) / (rd_counts + nbr_counts)
                     else:
-                        counts = (llrr_counts) / (llrr_counts + rd_counts)
-                    counts[np.isnan(counts)] = 0
+                        if np.sum(rd_counts) > 0:
+                            counts = (llrr_counts) / (llrr_counts + rd_counts)
+                        else:
+                            counts = llrr_counts
+                        counts[np.isnan(counts)] = 0
                 else:
                     counts = self.aln_index.intersect(signal, interval_pair.intervalA, interval_pair.intervalB)
                 vmin = 0
-                total_counts += np.sum(counts)
+            total_counts += np.sum(counts)
             if self.view_mode:
-                print(signal, np.max(counts), np.min(counts))
+                logging.debug("%s: %d %d" % (signal, np.max(counts), np.min(counts)))
+            if signal == constants.SVSignals.RD and np.max(counts) == 0 and np.min(counts) == 0:
+                return None, 0
             if self.apply_filters and signal in [constants.SVSignals.SR_RP, constants.SVSignals.LLRR,
                                                  constants.SVSignals.RL, constants.SVSignals.LLRR_VS_LR]:
                 image[:, :, i] = heatmap_with_filters_demo(counts, img_size=self.config.heatmap_dim,
@@ -188,6 +216,8 @@ class SVStreamingDataset(IterableDataset):
             total_counts = 0
             if not self.annotate:
                 image, total_counts = self.make_image(interval_pair)
+                if total_counts == 0:
+                    continue
             if self.annotate:
                 target = self.get_ground_truth_target(interval_pair)
                 if target is None and not self.allow_empty:  # skip images with no events
@@ -262,9 +292,9 @@ class SVStaticDataset(Dataset):
 
 class SVBedScanner(SVStreamingDataset):
     def __init__(self, config, interval_size, step_size=None, include_chrs=None, exclude_chrs=None,
-                 allow_empty=False, store=False, padding=50000, bcindex=None):
+                 allow_empty=False, store=False, padding=50000, aln_index=None):
         super().__init__(config, interval_size, step_size, include_chrs, exclude_chrs, allow_empty, store,
-                         bcindex=bcindex, view_mode=True)
+                         aln_index=aln_index, view_mode=True)
         self.padding = padding
 
     def get_genome_iterator(self):
@@ -274,7 +304,7 @@ class SVBedScanner(SVStreamingDataset):
                 continue
             interval = GenomeInterval(rec.intervalA.chr_name, rec.intervalA.start, rec.intervalB.start)
             interval = interval.pad(self.aln_index.chr_index, self.padding)
-            print(rec.to_bedpe_aux(), rec.get_sv_type_with_zyg())
+            logging.info("%s %s %s" % (rec.to_bedpe_aux(), rec.get_sv_type_with_zyg(), interval))
             if len(interval) < 600000:  # limit the size of the heatmap to be generated
                 yield GenomeIntervalPair(interval, interval)
             else:  # shift the y axis to show the breakpoints only

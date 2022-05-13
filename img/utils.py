@@ -4,6 +4,7 @@ import img.constants as constants
 import seq.intervals as intervals
 import seq.io as io
 import seq.filters as filters
+import logging
 
 def upscale_keypoints(keypoints, ratio):
     return keypoints * ratio
@@ -69,7 +70,7 @@ def img_to_svs(target, data_config, chr_index):
         y = data_config.image_dim - y
         x_bp = pixel_to_bp(x, genome_interval_pair.intervalA, data_config.image_dim)
         y_bp = pixel_to_bp(y, genome_interval_pair.intervalB, data_config.image_dim)
-        print(genome_interval_pair, sv_type, x, y, x_bp, y_bp)
+        logging.debug("img2sv: %s %s %d %d %d %d" % (genome_interval_pair, sv_type, x, y, x_bp, y_bp))
         sv_interval_pair = intervals.GenomeIntervalPair(
             intervals.GenomeInterval(genome_interval_pair.intervalA.chr_name, x_bp, x_bp + 1),
             intervals.GenomeInterval(genome_interval_pair.intervalB.chr_name, y_bp, y_bp + 1))
