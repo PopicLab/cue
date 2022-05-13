@@ -1,0 +1,50 @@
+##fileformat=VCFv4.2
+##FILTER=<ID=PASS,Description="All filters passed">
+##contig=<ID=chr1,length=248956422>
+##contig=<ID=chr2,length=242193529>
+##contig=<ID=chr3,length=198295559>
+##contig=<ID=chr4,length=190214555>
+##contig=<ID=chr5,length=181538259>
+##contig=<ID=chr6,length=170805979>
+##contig=<ID=chr7,length=159345973>
+##contig=<ID=chr8,length=145138636>
+##contig=<ID=chr9,length=138394717>
+##contig=<ID=chr10,length=133797422>
+##contig=<ID=chr11,length=135086622>
+##contig=<ID=chr12,length=133275309>
+##contig=<ID=chr13,length=114364328>
+##contig=<ID=chr14,length=107043718>
+##contig=<ID=chr15,length=101991189>
+##contig=<ID=chr16,length=90338345>
+##contig=<ID=chr17,length=83257441>
+##contig=<ID=chr18,length=80373285>
+##contig=<ID=chr19,length=58617616>
+##contig=<ID=chr20,length=64444167>
+##contig=<ID=chr21,length=46709983>
+##contig=<ID=chr22,length=50818468>
+##contig=<ID=chrX,length=156040895>
+##contig=<ID=chrY,length=57227415>
+##INFO=<ID=END,Number=1,Type=Integer,Description="End position of the variant described in this record">
+##INFO=<ID=CIPOS,Number=2,Type=Integer,Description="Confidence interval around POS for imprecise variants">
+##INFO=<ID=CIEND,Number=2,Type=Integer,Description="Confidence interval around END for imprecise variants">
+##INFO=<ID=SVTYPE,Number=1,Type=String,Description="Type of structural variant">
+##INFO=<ID=SVLEN,Number=1,Type=Integer,Description="Length of structural variant">
+##INFO=<ID=SVMETHOD,Number=1,Type=String,Description="SV detection method">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE
+chr21	10399416	DUP	N	<DUP>	86	PASS	END=10427813;SVTYPE=DUP;SVLEN=28398	GT	0/1
+chr21	14855666	INV	N	<INV>	82	PASS	END=14870587;SVTYPE=INV;SVLEN=14922	GT	0/1
+chr21	14874025	DEL	N	<DEL>	82	PASS	END=14891603;SVTYPE=DEL;SVLEN=17579	GT	1/1
+chr21	14234963	DEL	N	<DEL>	82	PASS	END=14368829;SVTYPE=DEL;SVLEN=133867	GT	0/1
+chr21	14606447	DEL	N	<DEL>	82	PASS	END=14665626;SVTYPE=DEL;SVLEN=59180	GT	1/1
+chr21	13073635	DEL	N	<DEL>	82	PASS	END=13109063;SVTYPE=DEL;SVLEN=35429	GT	1/1
+chr21	13294143	DUP	N	<DUP>	81	PASS	END=13440001;SVTYPE=DUP;SVLEN=145859	GT	1/1
+chr21	14916799	INV	N	<INV>	81	PASS	END=14961603;SVTYPE=INV;SVLEN=44805	GT	0/1
+chr21	14375002	DUP	N	<DUP>	81	PASS	END=14560118;SVTYPE=DUP;SVLEN=185117	GT	1/1
+chr21	14078127	DUP	N	<DUP>	81	PASS	END=14175079;SVTYPE=DUP;SVLEN=96953	GT	0/1
+chr21	13123830	DEL	N	<DEL>	81	PASS	END=13202032;SVTYPE=DEL;SVLEN=78203	GT	0/1
+chr21	14019143	INV	N	<INV>	80	PASS	END=14077149;SVTYPE=INV;SVLEN=58007	GT	1/1
+chr21	10006838	DUP	N	<DUP>	80	PASS	END=10111095;SVTYPE=DUP;SVLEN=104258	GT	0/1
+chr21	12989064	DEL	N	<DEL>	80	PASS	END=13027149;SVTYPE=DEL;SVLEN=38086	GT	0/1
+chr21	10566994	DEL	N	<DEL>	78	PASS	END=10704376;SVTYPE=DEL;SVLEN=137383	GT	0/1
+chr21	13519143	DEL	N	<DEL>	78	PASS	END=13703087;SVTYPE=DEL;SVLEN=183945	GT	0/1
