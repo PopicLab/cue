@@ -18,7 +18,7 @@ which encode the location, type, and genotype of the SVs in this image, and
 * the high-confidence SV predictions are refined and mapped back from image to genome coordinates.
 
 <p align="center">
-<img src="docs/img/Cue_overview.png" alt="drawing" width="600"/>
+<img src="docs/img/Cue_overview.png" alt="drawing" width="1000"/>
 </p>
 
 The current version of ```cue``` can be used to detect and genotype the following SV types: 
@@ -100,22 +100,22 @@ For example, here are the annotations and channels produced for the above three 
 
 ```DUP: chr21   10399416-10427813```
 
-|       Annotated           |        Read-depth         |   Read-pairs/Split-reads  |        LL+RR pairs        |         RL pairs         |
+|       Annotation          |        READ-DEPTH         |   SPLIT-READ/READ-PAIRS  |         LL+RR PAIRS        |          RL PAIRS         |
 |:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:|
-|![](data/demo/expected_results/annotated_images/8411211701_0_chr21_10349415-10477813_&_chr21_10349415-10477813.png)  |  ![](data/demo/expected_results/images/8411211701_chr21_10349415-10477813_&_chr21_10349415-10477813.png.ch1.png) |  ![](data/demo/expected_results/images/8411211701_chr21_10349415-10477813_&_chr21_10349415-10477813.png.ch2.png) |  ![](data/demo/expected_results/images/8411211701_chr21_10349415-10477813_&_chr21_10349415-10477813.png.ch3.png) |  ![](data/demo/expected_results/images/8411211701_chr21_10349415-10477813_&_chr21_10349415-10477813.png.ch4.png) | 
+|<img src="data/demo/expected_results/annotated_images/8411211701_0_chr21_10349415-10477813_&_chr21_10349415-10477813.png" alt="drawing" width="200"/> |  <img src="data/demo/expected_results/images/8411211701_chr21_10349415-10477813_&_chr21_10349415-10477813.png.ch1.png" alt="drawing" width="200"/> |  <img src="data/demo/expected_results/images/8411211701_chr21_10349415-10477813_&_chr21_10349415-10477813.png.ch2.png" alt="drawing" width="200"/> |  <img src="data/demo/expected_results/images/8411211701_chr21_10349415-10477813_&_chr21_10349415-10477813.png.ch3.png" alt="drawing" width="200"/> |  <img src="data/demo/expected_results/images/8411211701_chr21_10349415-10477813_&_chr21_10349415-10477813.png.ch4.png" alt="drawing" width="200"/> | 
 
 ```INV: chr21   14855666-14870587```
 
-|       Annotated           |        Read-depth         |   Read-pairs/Split-reads  |        LL+RR pairs        |         RL pairs         |
-|:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:
-|![](data/demo/expected_results/annotated_images/8411211701_0_chr21_10349415-10477813_&_chr21_10349415-10477813.png)  |  ![](data/demo/expected_results/images/8411211701_chr21_14805665-14920587_&_chr21_14805665-14920587.png.ch1.png) |  ![](data/demo/expected_results/images/8411211701_chr21_14805665-14920587_&_chr21_14805665-14920587.png.ch2.png) |  ![](data/demo/expected_results/images/8411211701_chr21_14805665-14920587_&_chr21_14805665-14920587.png.ch3.png) |  ![](data/demo/expected_results/images/8411211701_chr21_14805665-14920587_&_chr21_14805665-14920587.png.ch4.png)|
+|       Annotation          |        READ-DEPTH         |   SPLIT-READ/READ-PAIRS  |         LL+RR PAIRS        |          RL PAIRS        |
+|:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:|
+|<img src="data/demo/expected_results/annotated_images/8411211701_0_chr21_14805665-14920587_&_chr21_chr21_14805665-14920587.png" alt="drawing" width="200"/>  |  <img src="data/demo/expected_results/images/8411211701_chr21_14805665-14920587_&_chr21_14805665-14920587.png.ch1.png" alt="drawing" width="200"/> |  <img src="data/demo/expected_results/images/8411211701_chr21_14805665-14920587_&_chr21_14805665-14920587.png.ch2.png" alt="drawing" width="200"/> |  <img src="data/demo/expected_results/images/8411211701_chr21_14805665-14920587_&_chr21_14805665-14920587.png.ch3.png" alt="drawing" width="200"/> |  <img src="data/demo/expected_results/images/8411211701_chr21_14805665-14920587_&_chr21_14805665-14920587.png.ch4.png" alt="drawing" width="200"/>|
 
 
 ```DEL: chr21   14874025-14891603```
 
-|       Annotated           |        Read-depth         |   Read-pairs/Split-reads  |        LL+RR pairs        |         RL pairs         |
-|:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:
-|![](data/demo/expected_results/annotated_images/8411211701_0_chr21_10349415-10477813_&_chr21_10349415-10477813.png)  |  ![](data/demo/expected_results/images/8411211701_chr21_14824024-14941603_&_chr21_14824024-14941603.png.ch1.png) |  ![](data/demo/expected_results/images/8411211701_chr21_14824024-14941603_&_chr21_14824024-14941603.png.ch2.png) |  ![](data/demo/expected_results/images/8411211701_chr21_14824024-14941603_&_chr21_14824024-14941603.png.ch3.png) |  ![](data/demo/expected_results/images/8411211701_chr21_14824024-14941603_&_chr21_14824024-14941603.png.ch4.png)|
+|       Annotation          |        READ-DEPTH         |   SPLIT-READ/READ-PAIRS  |         LL+RR PAIRS        |          RL PAIRS         |
+|:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:|
+|<img src="data/demo/expected_results/annotated_images/8411211701_0_chr21_14824024-14941603_&_chr21_14824024-14941603.png" alt="drawing" width="200"/>  |  <img src="data/demo/expected_results/images/8411211701_chr21_14824024-14941603_&_chr21_14824024-14941603.png.ch1.png" alt="drawing" width="200"/> |  <img src="data/demo/expected_results/images/8411211701_chr21_14824024-14941603_&_chr21_14824024-14941603.png.ch2.png" alt="drawing" width="200"/> |  <img src="data/demo/expected_results/images/8411211701_chr21_14824024-14941603_&_chr21_14824024-14941603.png.ch3.png" alt="drawing" width="200"/> |  <img src="data/demo/expected_results/images/8411211701_chr21_14824024-14941603_&_chr21_14824024-14941603.png.ch4.png" alt="drawing" width="200"/>|
 
 
 3. (Optional) To evaluate the results against the ground truth SVs using Truvari:
