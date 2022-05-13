@@ -4,7 +4,7 @@
 [Overview](#overview)  
 [Installation](#install)  
 [Demo / Tutorial](#demo)  
-[Repository structure](#structure)  
+[Execution](#structure)  
 [Recommended workflow](#workflow)     
   
 <a name="overview"></a>
@@ -39,11 +39,11 @@ and [video](https://www.youtube.com/watch?v=EVlLqig3qEI).
 * Create the virtual environment (in the env directory): 
 ```$> python3.7 -m venv env```
 
-* Activate the environment: 
+* Activate the environment:
 ```$> source env/bin/activate```
 
-* Install all the required packages in the virtual environment (this should take a few minutes):
-```$> pip --no-cache-dir install -r install/requirements.txt```
+* Install all the required packages in the virtual environment (this should take a few minutes):  
+```$> pip --no-cache-dir install -r install/requirements.txt```  
 Packages can also be installed individually using the recommended versions 
 provided in the ```install/requirements.txt``` file; for example:
 ```$> pip install numpy==1.18.5```
@@ -64,7 +64,7 @@ in the ```data/demo/exec``` directory.
 The expected results are provided in the ```data/demo/expected_results``` directory. 
 All commands should be executed from the top-level directory of the ```cue``` repository.
 
-1. To call variants given the input BAM file and the provided pretrained ```cue``` model on a single CPU: 
+1. To call variants given the input BAM file and the provided pretrained ```cue``` model on a single CPU:   
 ```python engine/call.py --data_config data/demo/exec/data.yaml --model_config data/demo/exec/model.yaml```
 
 This command will launch ```cue``` in variant discovery mode. The input BAM file will first be indexed and 
@@ -88,7 +88,7 @@ chr21   14855666        INV     N       <INV>   82      PASS    END=14870587;SVT
 chr21   14874025        DEL     N       <DEL>   82      PASS    END=14891603;SVTYPE=DEL;SVLEN=17579     GT      1/1 
 ```
 
-2. (Optional) To visualize the SVs results:
+2. (Optional) To visualize the SVs results:  
 
 ```python engine/view.py --config data/demo/exec/view.yaml```
 
@@ -122,14 +122,14 @@ For example, here are the annotations and channels produced for the above three 
 
 In order to execute Truvari, we need to post-process the produced VCF to the input format required by Truvari; 
 in particular, we need to sort, compress, and index the SV VCF file. We recommend using ```bcftools``` and ```htslib``` 
-for this task as follows.
+for this task as follows.  
 
-a. Sort the VCF by position: ```bcftools sort data/demo/exec/reports/svs.vcf > data/demo/exec/reports/svs.sorted.vcf``` 
-b. Compress the sorted VCF: ```bgzip -f data/demo/exec/reports/svs.sorted.vcf``` 
-c. Index the compressed VCF: ```bcftools index -t data/demo/exec/reports/svs.sorted.vcf.gz```
+a. Sort the VCF by position: ```bcftools sort data/demo/exec/reports/svs.vcf > data/demo/exec/reports/svs.sorted.vcf```   
+b. Compress the sorted VCF: ```bgzip -f data/demo/exec/reports/svs.sorted.vcf```   
+c. Index the compressed VCF: ```bcftools index -t data/demo/exec/reports/svs.sorted.vcf.gz```  
 
-We can now execute Truvari as follows:
-```truvari bench -b data/demo/ground_truth/svs.chr21.small.vcf.gz -c data/demo/exec/reports/svs.sorted.vcf.gz -o data/demo/expected_results/reports/truvari --pctsize=0.5 --pctov=0.5 --passonly --sizemax 5000000 --pctsim 0 --gtcomp```
+We can now execute Truvari as follows:  
+```truvari bench -b data/demo/ground_truth/svs.chr21.small.vcf.gz -c data/demo/exec/reports/svs.sorted.vcf.gz -o data/demo/expected_results/reports/truvari --pctsize=0.5 --pctov=0.5 --passonly --sizemax 5000000 --pctsim 0 --gtcomp```  
 
 Truvari will report the precision, recall, and F1 score for this small benchmark. 
 The above command will require a genotype match to consider an SV call a true positive (TP).
@@ -152,9 +152,9 @@ Additional information produced by Truvari can be found here: ```data/demo/expec
 
 
 <a name="structure"></a>
-### Repository structure
+### Execution
 
-The ```engine``` directory contains the following key scripts to train/evaluate the model 
+In addition to the functionality to call structural variants, the framework can be used to execute custom model training, evaluation, and image generation. The ```engine``` directory contains the following key high-level scripts to train/evaluate the model 
 and generate image datasets:
 
 * ```generate.py```: creates an annotated image dataset from alignments (BAM file(s))
@@ -165,12 +165,11 @@ to detect SV keypoints in images
 * ```view.py```: plots images annotated with SVs from a VCF/BEDPE file given genome alignments (BAM format);
 can be used to visualize model predictions or ground truth SVs 
 
-Each script accepts as input one or multiple YAML config files, 
-which encode a variety of parameters. Template config files are provided 
+Each script accepts as input one or multiple YAML config files, which encode a variety of parameters. Template config files are provided 
 in the ```config``` directory.
 
 <a name="workflow"></a>
-### Recommended workflow 
+#### Recommended workflow 
 
 1. Create a new directory.
 2. Place YAML config file(s) in this directory (see the provided templates).
