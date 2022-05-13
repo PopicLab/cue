@@ -117,7 +117,7 @@ class DatasetConfig:
         # logging
         self.log_file = self.info_dir + 'main.log'
         # noinspection PyArgumentList
-        logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.DEBUG,
+        logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO,
                             handlers=[logging.FileHandler(self.log_file, mode='w'), logging.StreamHandler(sys.stdout)])
         logging.info(self)
 

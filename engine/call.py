@@ -15,6 +15,9 @@ from seq.aln_index import AlnIndex
 from joblib import Parallel, delayed
 import seq.utils as seq_utils
 from pathlib import Path
+import warnings
+warnings.filterwarnings("ignore")
+
 
 # ------ CLI ------
 parser = argparse.ArgumentParser(description='SV calling functionality')
@@ -25,7 +28,7 @@ parser.add_argument('--skip_inference', action='store_true', help='Do not re-run
 args = parser.parse_args()
 
 # load the configs
-config = config_utils.load_config(args.inference_config, config_type=config_utils.CONFIG_TYPE.TEST)
+config = config_utils.load_config(args.model_config, config_type=config_utils.CONFIG_TYPE.TEST)
 data_config = config_utils.load_config(args.data_config, config_type=config_utils.CONFIG_TYPE.DATA)
 refine_config = None
 if args.refine_config is not None:
@@ -52,6 +55,7 @@ def call(device, chr_names, uid):
                                      include_chrs=[chr_name], allow_empty=True, aln_index=aln_index)
         data_loader = DataLoader(dataset=dataset, batch_size=config.batch_size, shuffle=False,
                                  collate_fn=datasets.collate_fn)
+        logging.info("Generating SV predictions for %s" % chr_name)
         predictions = engine.evaluate(model, data_loader, config, device, output_dir=predictions_dir,
                                       collect_data_metrics=True, given_ground_truth=given_ground_truth)
         torch.save(predictions, "%s/predictions.pkl" % predictions_dir)
@@ -77,7 +81,7 @@ for interval_size in data_config.interval_size:
         outputs = []
         for chr_name in chr_names:
             predictions_dir = "%s/predictions/0.%s/" % (config.report_dir, chr_name)
-            print("Loading: ", predictions_dir)
+            logging.debug("Loading: ", predictions_dir)
             predictions_per_chr = torch.load("%s/predictions.pkl" % predictions_dir)
             outputs.extend(predictions_per_chr)
         outputs_per_scan.append(outputs)
