@@ -1,5 +1,3 @@
-## [STATUS] Full documentation, code, and model release in progress! 
-
 # Cue: a deep learning framework for SV calling and genotyping
 
 ##### Table of Contents  
@@ -19,7 +17,9 @@ in the following stages illustrated in the figure below:
 which encode the location, type, and genotype of the SVs in this image, and 
 * the high-confidence SV predictions are refined and mapped back from image to genome coordinates.
 
-[](docs/img/Cue_overview.png)
+<p align="center">
+<img src="docs/img/Cue_overview.png" alt="drawing" width="600"/>
+</p>
 
 The current version of ```cue``` can be used to detect and genotype the following SV types: 
 deletions (DELs), tandem duplication (DUPs), inversions (INVs), deletion-flanked inversions (INVDELs), 
