@@ -55,10 +55,11 @@ To deactivate the environment: ```$> deactivate```
 <a name="demo"></a>
 ### Tutorial
 
-We recommend trying the provided [demo notebook](notebooks/tutorial.ipynb) to ensure that the software was properly 
-installed and to experiment running Cue. In this demo we will use Cue to discover variants in 
-a small BAM file provided here: ```data/demo/inputs/chr21.small.bam``` (with the associated YAML config files needed 
-to execute this workflow provided in the ```data/demo/config``` directory).
+We recommend trying the provided demo Jupyter [notebook](notebooks/tutorial.ipynb) to ensure that the software 
+was properly installed and to experiment running Cue. For convenience, Jupyter was already included in the installation 
+requirements above, or can be installed separately from [here](http://jupyter.org/install).
+In this demo we use Cue to discover variants in a small BAM file provided here: ```data/demo/inputs/chr21.small.bam``` 
+(with the associated YAML config files needed to execute this workflow provided in the ```data/demo/config``` directory).
 
 <a name="guide"></a>
 ### User guide
@@ -105,7 +106,7 @@ The key required and optional YAML parameters for each Cue command are listed be
 ```view.py```:
 * ```bam``` [*required*] path to the alignments BAM file
 * ```bed``` [*required*] path to the BED or VCF file with SVs to visualize
-* ```fai``` [*required*] path to the referene FASTA FAI file
+* ```fai``` [*required*] path to the reference FASTA FAI file
 * ```n_cpus```  [*optional*] number of CPUs (parallelized by chromosome)
 * ```chr_names``` [*optional*] list of chromosomes to process: null (all) or a specific list e.g. ["chr1", "chr21"]
 
@@ -117,3 +118,13 @@ The key required and optional YAML parameters for each Cue command are listed be
 3. Populate the YAML config file(s) with the parameters specific to this experiment.
 4. Execute the appropriate ```engine``` script providing the path to the newly configured YAML file(s).
 The engine scripts will automatically create auxiliary directories with results in the folder where the config YAML files are located.
+
+#### Authors
+
+Victoria Popic (vpopic@broadinstitute.org)
+
+#### Feedback and technical support
+
+For questions, suggestions, or technical assistance, please create an issue on the Cue 
+[Github issues](https://github.com/PopicLab/cue/issues) page or 
+reach out to Victoria Popic at vpopic@broadinstitute.org.
