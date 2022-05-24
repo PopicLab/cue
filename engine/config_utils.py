@@ -127,7 +127,8 @@ class DatasetConfig:
         self.bam_type = constants.BAM_TYPE[self.bam_type]
         self.signal_set = constants.SV_SIGNAL_SET[self.signal_set]
         self.num_signals = len(constants.SV_SIGNALS_BY_TYPE[self.signal_set])
-        self.uid = ''.join(["{}".format(randint(0, 9)) for _ in range(0, 10)])
+        # self.uid = ''.join(["{}".format(randint(0, 9)) for _ in range(0, 10)])
+        self.uid = ''.join(["{}".format(0) for _ in range(0, 10)])
 
         # setup the dataset directory structure
         Path(self.info_dir).mkdir(parents=True, exist_ok=True)

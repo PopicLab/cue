@@ -1,0 +1,16 @@
+#### REQUIRED ####
+model_path: "../data/models/cue.pt"  # path to the pretrained Cue model
+#### OPTIONAL ####
+gpu_ids: []  # list of GPU ids to use for calling -- a CPU will be used if empty
+report_interval: 5  # frequency (in number of batches) for reporting training stats and image predictions
+pretrained_refinenn_path: null  # path to the pretrained keypoint refinement model
+#### FIXED (do not modify) ####
+image_dim: 256
+class_set: "BASIC5ZYG"
+signal_set: "SHORT"
+num_keypoints: 1
+model_architecture: "HG"
+batch_size: 16
+sigma: 10
+stride: 4
+heatmap_peak_threshold: 0.65
