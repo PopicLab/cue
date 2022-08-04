@@ -24,8 +24,7 @@ def downscale_tensor(image, to_image_dim, target=None):
     ratio = image.shape[1] / to_image_dim
     if target is not None:
         target = downscale_target(target, ratio)
-    return F.interpolate(image.unsqueeze(0), size=(to_image_dim, to_image_dim),
-                         recompute_scale_factor=True).squeeze(0), target
+    return F.interpolate(image.unsqueeze(0), size=(to_image_dim, to_image_dim)).squeeze(0), target
 
 
 def downscale_image(image, to_image_dim, target=None):

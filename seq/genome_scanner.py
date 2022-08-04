@@ -45,7 +45,7 @@ class SVGenomeScanner:
             current_pos = 0
             while current_pos < chr.len:
                 interval = GenomeInterval(chr.name, current_pos, min(current_pos + self.interval_size, chr.len))
-                logging.debug("Interval: %s" % str(interval))
+                logging.info("Interval: %s" % str(interval))
                 if current_pos and current_pos % 1000000 == 0:
                     logging.info("Scanned %d loci on %s" % (current_pos, chr.name))
                 next_gap = self.blacklist.next_gap_overlap(interval) if self.blacklist is not None else None

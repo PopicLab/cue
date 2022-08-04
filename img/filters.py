@@ -85,6 +85,8 @@ def nms2D_iou(output, image_dim, iou_threshold=0.1):
         kp = output[TargetType.keypoints][sv_idx].tolist()[0]  # top left corner
         output[TargetType.keypoints][sv_idx][0][2] = constants.KP_FILTERED
         boxes.append(get_bbox(kp, output[TargetType.gloc], image_dim))
+    if not boxes:
+        return
     output[TargetType.boxes] = torch.tensor(boxes)
     keep = nms(output[TargetType.boxes], output[TargetType.scores], iou_threshold)
     for sv_idx in keep:

@@ -63,7 +63,8 @@ def call(device, chr_names, uid):
     model = models.MultiSVHG(config)
     model.load_state_dict(torch.load(config.model_path, device))
     model.to(device)
-    print("Loaded model: %s on %s" % (config.model_path, str(device)))
+    logging.root.setLevel(logging.INFO)
+    logging.info("Loaded model: %s on %s" % (config.model_path, str(device)))
 
     # process each chromosome, loaded as a separate dataset
     for chr_name in chr_names:
@@ -82,6 +83,7 @@ def call(device, chr_names, uid):
                                       collect_data_metrics=True, given_ground_truth=given_ground_truth)
         torch.save(predictions, "%s/predictions.pkl" % predictions_dir)
     return True
+
 
 
 # ------ Image-based discovery ------
