@@ -65,6 +65,9 @@ def train(model, optimizer, data_loader, config, epoch, collect_data_metrics=Fal
         if batch_id and batch_id % config.report_interval == 0:
             plotting.plot_images(images, outputs, range(len(images)), config.classes, targets2=targets,
                                  fig_name="%s/train.batch%d.png" % (output_dir, batch_id))
+        if batch_id and batch_id % config.model_checkpoint_interval == 0:
+            torch.save(model.state_dict(), "%s.epoch%d.batch%d" % (config.model_path, epoch, batch_id))
+
     if collect_data_metrics:
         data_stats.report()
 
