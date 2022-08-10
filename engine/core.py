@@ -92,7 +92,7 @@ def evaluate(model, data_loader, config, device, output_dir, collect_data_metric
         if filters:
             # apply image-based filters
             image_filters.filter_keypoints(predictions, config)
-        if batch_id % config.report_interval == 0:
+        if config.report_interval is not None and batch_id % config.report_interval == 0:
             plotting.plot_images(images, predictions, range(len(images)), config.classes,
                                  fig_name="%s/predictions.batch%d.png" % (output_dir, batch_id),
                                  targets2=targets)

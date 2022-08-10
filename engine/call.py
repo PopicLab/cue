@@ -63,7 +63,7 @@ def call(device, chr_names, uid):
     model = models.MultiSVHG(config)
     model.load_state_dict(torch.load(config.model_path, device))
     model.to(device)
-    logging.root.setLevel(logging.INFO)
+    logging.root.setLevel(logging.getLevelName(config.logging_level))
     logging.info("Loaded model: %s on %s" % (config.model_path, str(device)))
 
     # process each chromosome, loaded as a separate dataset

@@ -32,6 +32,7 @@ from img import constants
 from img.constants import SVSignals
 from collections import defaultdict
 import operator
+import logging
 
 
 class AlnIndex:
@@ -203,14 +204,14 @@ class AlnIndex:
         aux_index1 = AlnIndex.load_chr(bam_fname1, bin_size, chr_name, signal_set1.name)
         aux_index2 = AlnIndex.load_chr(bam_fname2, bin_size, chr_name, signal_set2)
         merged_index_fname = "%s.%s.%d.%s_%s.auxindex" % (bam_fname1, chr_name, bin_size, signal_set1.name, signal_set2)
-        print("Generating AUX index %s" % merged_index_fname)
+        logging.info("Generating AUX index %s" % merged_index_fname)
         merged_auxindex = AlnIndex(aux_index1.chr_index, bin_size, chr_name, constants.SV_SIGNAL_SET.EMPTY)
         tid = merged_auxindex.tid
         for signal in aux_index1.signal_set:
             merged_auxindex.bins[signal][tid] = aux_index1.bins[signal][tid] 
         for signal in aux_index2.signal_set:
             merged_auxindex.bins[constants.to_ref_signal(signal)][tid] = aux_index2.bins[signal][tid]
-            print(signal, constants.to_ref_signal(signal))  
+            logging.debug(signal, constants.to_ref_signal(signal))  
         merged_auxindex.store(merged_index_fname)
 
     @staticmethod
@@ -221,7 +222,7 @@ class AlnIndex:
         index_fname = "%s.%s.%d.%s.auxindex" % (bam_fname, chr_name, bin_size, signal_set_origin)
         if os.path.isfile(index_fname):
             aux_index = AlnIndex.load(index_fname)
-            print("Loaded AUX index: ", index_fname)
+            logging.info("Loaded AUX index: ", index_fname)
         if aux_index is None:  # compute the index
             aux_index = AlnIndex.generate(bam_fname, chr_name, fai_fname, bin_size, min_mapq_dict, signal_set,
                                           signal_set_origin, bam_type)
@@ -230,7 +231,7 @@ class AlnIndex:
     @staticmethod
     def generate(bam_fname, chr_name, fai_fname, bin_size, min_mapq_dict, signal_set, signal_set_origin, bam_type):
         index_fname = "%s.%s.%d.%s.auxindex" % (bam_fname, chr_name, bin_size, signal_set_origin)
-        print("Generating AUX index %s" % index_fname)
+        logging.info("Generating AUX index %s" % index_fname)
         chr_index = io.load_faidx(fai_fname)
         aux_index = AlnIndex(chr_index, bin_size, chr_name, signal_set)
         assert bam_type != constants.BAM_TYPE.LONG

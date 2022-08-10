@@ -62,7 +62,7 @@ class Config:
         # logging
         self.log_file = self.log_dir + 'main.log'
         # noinspection PyArgumentList
-        logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO,
+        logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.getLevelName(self.logging_level),
                             handlers=[logging.FileHandler(self.log_file, mode='w'), logging.StreamHandler(sys.stdout)])
 
         # shared training and testing configs
@@ -141,7 +141,7 @@ class DatasetConfig:
         # logging
         self.log_file = self.info_dir + 'main.log'
         # noinspection PyArgumentList
-        logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO,
+        logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.getLevelName(self.logging_level),
                             handlers=[logging.FileHandler(self.log_file, mode='w'), logging.StreamHandler(sys.stdout)])
         logging.info(self)
 
