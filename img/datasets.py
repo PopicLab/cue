@@ -46,7 +46,7 @@ from scipy.ndimage import convolve
 class SVStreamingDataset(IterableDataset):
     def __init__(self, config, interval_size, step_size=None, include_chrs=None, exclude_chrs=None,
                  allow_empty=False, store=False, aln_index=None, view_mode=False,
-                 generate_empty=False, convert_to_empty=False):
+                 generate_empty=False, convert_to_empty=False, remove_annotation=False):
         super().__init__()
         self.config = config
         self.interval_size = interval_size
@@ -62,6 +62,7 @@ class SVStreamingDataset(IterableDataset):
         self.apply_filters = False
         self.aln_index = aln_index
         self.annotate = config.bed is not None
+        self.remove_annotation = remove_annotation
         self.ground_truth = io.BedRecordContainer(config.bed) if self.annotate else None
         self.transform = transforms.Compose([transforms.ToTensor()])  # TODO(viq): normalize
         self.signal_set = config.signal_set
@@ -109,7 +110,7 @@ class SVStreamingDataset(IterableDataset):
                     sv_keypoints.append([x_max, y_max, (x_max < self.config.heatmap_dim
                                                         and y_max < self.config.heatmap_dim)])
                 keypoints.append(sv_keypoints)
-                logging.debug("%s: [%d %d %d %d], [%d %d %d %d], %s %s" % (record, x_min, x_max, y_min, y_max,
+                logging.info("%s: [%d %d %d %d], [%d %d %d %d], %s %s" % (record, x_min, x_max, y_min, y_max,
                                                                         box_x_min, box_x_max, box_y_min, box_y_max,
                                                                         record.get_sv_type(), record.get_sv_type_with_zyg()))
                 logging.debug(keypoints)
@@ -227,6 +228,8 @@ class SVStreamingDataset(IterableDataset):
                     continue
                 if self.store:
                     self.save_image(image, idx, interval_pair)
+                    if self.remove_annotation:
+                        target = None 
                     torch.save(target, self.config.annotation_dir + "%s_%d_%s.target" % (self.config.uid, idx,
                                                                                          str(interval_pair)))
                     # debug
@@ -268,7 +271,7 @@ class SVStaticDataset(Dataset):
         self.dataset_id = dataset_id
 
     def __len__(self):
-        return min(len(self.images[0]), 200000)
+        return min(len(self.images[0]), 1000000)
 
     def __getitem__(self, index):
         image = []
