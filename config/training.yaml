@@ -1,5 +1,6 @@
 dataset_dirs: ["/path/to/imageset"]
 gpu_ids: [0]
+n_jobs_per_gpu: 1
 pretrained_model: null
 signal_set: "SHORT"
 signal_set_origin: "SHORT"

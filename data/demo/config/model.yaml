@@ -2,6 +2,7 @@
 model_path: "../data/models/cue.pt"  # path to the pretrained Cue model
 #### OPTIONAL ####
 gpu_ids: []  # list of GPU ids to use for calling -- a CPU will be used if empty
+n_jobs_per_gpu: 1 # how many parallel jobs to launch on the same GPU
 report_interval: 5  # frequency (in number of batches) for reporting training stats and image predictions
 pretrained_refinenn_path: null  # path to the pretrained keypoint refinement model
 #### FIXED (do not modify) ####
