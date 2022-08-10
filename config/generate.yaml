@@ -5,6 +5,9 @@ fai: "/path/to/fai"  # path to the referene FASTA FAI file
 n_cpus: 1 # number of CPUs (parallelized by chromosome)
 chr_names: null # list of chromosomes to process: null (all) or a specific list e.g. ["chr1", "chr21"]
 # index and image generation/annotation configs (do not edit)
+store_img: True
+allow_empty: False
+empty_annotation: False
 blacklist_bed: null
 bam_type: "SHORT"
 signal_set: "SHORT"
