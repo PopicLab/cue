@@ -170,7 +170,7 @@ def bed_iter(bed_fname, bed_file_type=BED_FILE_TYPE.BEDPE, keep_chrs=None, exclu
                 yield record
 
 
-def vcf_iter(vcf_fname, min_size=1000, include_types=None):
+def vcf_iter(vcf_fname, min_size=0, include_types=None):
     vcf_file = VariantFile(vcf_fname)
     for rec in vcf_file.fetch():
         if 'SVTYPE' not in rec.info:
@@ -386,3 +386,19 @@ def bed2vcf(bedpe_file, vcf_fname, fai_fname, bed_file_type=BED_FILE_TYPE.BEDPE,
     vcf_out_file.close()
     os.remove(vcf_fname + ".format")
 
+
+def main():
+    parser = argparse.ArgumentParser(description='BED to VCF converter')
+    parser.add_argument('--bed', help='Input BED file with SVs')
+    parser.add_argument('--vcf', help='Output VCF')
+    parser.add_argument('--fai', help='FAI index file', default=None)
+    parser.add_argument('--sv_types', help='Types of SVs to keep', default=None)
+    parser.add_argument('--min_score', help='Min score', default=None, type=float)
+    parser.add_argument('--min_len', help='Min length', default=0, type=float)
+    parser.add_argument('--ftype', help='BED file type', default=BED_FILE_TYPE.BEDPE)
+    args = parser.parse_args()
+    bed2vcf(args.bed, args.vcf, args.fai, args.ftype, args.sv_types, args.min_score)
+
+
+if __name__ == '__main__':
+    main()
