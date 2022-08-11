@@ -211,7 +211,6 @@ class AlnIndex:
             merged_auxindex.bins[signal][tid] = aux_index1.bins[signal][tid] 
         for signal in aux_index2.signal_set:
             merged_auxindex.bins[constants.to_ref_signal(signal)][tid] = aux_index2.bins[signal][tid]
-            logging.debug(signal, constants.to_ref_signal(signal))  
         merged_auxindex.store(merged_index_fname)
 
     @staticmethod
@@ -222,7 +221,7 @@ class AlnIndex:
         index_fname = "%s.%s.%d.%s.auxindex" % (bam_fname, chr_name, bin_size, signal_set_origin)
         if os.path.isfile(index_fname):
             aux_index = AlnIndex.load(index_fname)
-            logging.info("Loaded AUX index: ", index_fname)
+            logging.info("Loaded AUX index: %s" % index_fname)
         if aux_index is None:  # compute the index
             aux_index = AlnIndex.generate(bam_fname, chr_name, fai_fname, bin_size, min_mapq_dict, signal_set,
                                           signal_set_origin, bam_type)
