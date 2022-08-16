@@ -46,7 +46,7 @@ class Config:
             os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(map(str, self.gpu_ids))
         if torch.cuda.is_available():
             for i in range(self.n_jobs_per_gpu*len(self.gpu_ids)):
-                self.devices.append(torch.device("cuda:%d" % int(i/4)))
+                self.devices.append(torch.device("cuda:%d" % int(i/self.n_jobs_per_gpu)))
         else:
             self.devices.append(torch.device("cpu"))
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
