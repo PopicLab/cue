@@ -52,6 +52,9 @@ provided in the ```install/requirements.txt``` file; for example:
 
 To deactivate the environment: ```$> deactivate```
 
+Alternatively, Cue can be installed using the```Dockerfile``` provided in the ```install/docker``` directory 
+from Cue's capsule in CodeOcean.
+
 <a name="demo"></a>
 ### Tutorial
 
