@@ -70,10 +70,7 @@ def call(device, chr_names, uid):
     for chr_name in chr_names:
         predictions_dir = "%s/predictions/%s.%s/" % (config.report_dir, uid, chr_name)
         Path(predictions_dir).mkdir(parents=True, exist_ok=True)
-        aln_index = AlnIndex.generate_or_load_chr(data_config.bam, chr_name, data_config.fai,
-                                                  data_config.bin_size, data_config.signal_mapq,
-                                                  data_config.signal_set, data_config.signal_set_origin,
-                                                  data_config.bam_type)
+        aln_index = AlnIndex.generate_or_load(chr_name, data_config)
         dataset = SVStreamingDataset(data_config, interval_size=interval_size, step_size=step_size, store=False,
                                      include_chrs=[chr_name], allow_empty=True, aln_index=aln_index)
         data_loader = DataLoader(dataset=dataset, batch_size=config.batch_size, shuffle=False,
@@ -140,10 +137,7 @@ if refine_config is not None and refine_config.pretrained_model is not None:
         refinery = SVKeypointRefinery(refinet, device, refine_config.padding, refine_config.image_dim)
         sv_calls = io.bed2sv_calls(candidate_out_bed_file)
         for chr_name in chr_names:
-            refinery.bam_index = AlnIndex.generate_or_load_chr(refine_config.bam, chr_name, refine_config.fai,
-                                                               refine_config.bin_size, refine_config.signal_mapq,
-                                                               refine_config.signal_set, refine_config.signal_set_origin,
-                                                               refine_config.bam_type)
+            refinery.bam_index = AlnIndex.generate_or_load(chr_name, refine_config)
             refinery.image_generator = SVStreamingDataset(refine_config, interval_size=None, store=False,
                                                           allow_empty=True, aln_index=refinery.bam_index)
             chr_calls = []

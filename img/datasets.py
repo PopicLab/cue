@@ -177,7 +177,7 @@ class SVStreamingDataset(IterableDataset):
                         counts = (llrr_counts + nbr_counts) / (rd_counts + nbr_counts)
                     else:
                         if np.sum(rd_counts) > 0:
-                            counts = (llrr_counts) / (llrr_counts + rd_counts)
+                            counts = llrr_counts / (llrr_counts + rd_counts)
                         else:
                             counts = llrr_counts
                         counts[np.isnan(counts)] = 0
@@ -339,8 +339,7 @@ class SVKeypointDataset(SVStreamingDataset):
             annotations = [fn for fn in os.listdir(annotation_dir) if "%s_" % chr_name in fn]
             if len(annotations) == 0:
                 continue
-            self.aln_index = AlnIndex.load_chr(self.config.bam, self.config.bin_size, chr_name,
-                                                   self.config.signal_set_origin)
+            self.aln_index = AlnIndex.load(AlnIndex.get_fname(chr_name, self.config))
             for ann_fname in annotations:
                 ann_path = os.path.join(annotation_dir, ann_fname)
                 annotation = torch.load(ann_path)
