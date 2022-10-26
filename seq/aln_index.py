@@ -71,7 +71,7 @@ class AlnIndex:
     def add(self, read, config):
         # 1. update the index bins
         for signal in self.signal_set:
-            self.add_by_signal(read, signal, config.min_mapq_dict)
+            self.add_by_signal(read, signal, config.signal_mapq)
 
         # 2. collect the read pair information for interval selection
         if self.is_valid_interval_read(read):
@@ -101,7 +101,7 @@ class AlnIndex:
             last_bin_id = bin_id_end
 
     def add_by_signal(self, read, signal, min_clipped_len=10):
-        if signal not in self.bins or not self.is_valid_index_read(read, signal, self.config.min_mapq_dict):
+        if signal not in self.bins or not self.is_valid_index_read(read, signal, self.config.signal_mapq):
             return
         bin_id = self.get_bin_id(self.get_read_bin_pos(read))
         assert len(self.bins[signal]) > bin_id, "%d %d %d" % (read.pos, bin_id, len(self.bins[signal]))
@@ -133,7 +133,7 @@ class AlnIndex:
     ###################
 
     def is_valid_index_read(self, read, signal):
-        if read.is_unmapped or read.mapping_quality < self.config.min_mapq_dict[signal] or \
+        if read.is_unmapped or read.mapping_quality < self.config.signal_mapq[signal] or \
                 (signal in constants.SV_SIGNAL_PAIRED and (read.mate_is_unmapped or
                                                            read.next_reference_name != read.reference_name)):
             return False
