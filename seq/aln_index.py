@@ -35,8 +35,8 @@ import logging
 
 class AlnIndex:
     def __init__(self, chr_name, config):
-        chr_index = io.load_faidx(config.fai)
-        self.chr = chr_index.chr_from_name(chr_name)
+        self.chr_index = io.load_faidx(config.fai)
+        self.chr = self.chr_index.chr_from_name(chr_name)
         self.config = config
         self.signal_set = constants.SV_SIGNALS_BY_TYPE[config.signal_set]
         self.bins = {}
@@ -49,8 +49,8 @@ class AlnIndex:
         self.interval_pair_support = defaultdict(int)  # stores the number of discordant pairs across the two intervals
         self.intervals = set()
         self.interval_pairs = []
-
         self.steps_per_interval = self.config.interval_size // self.config.step_size
+        logging.info("Number of bins: %d" % self.n_bins)       
 
     #####################
     #   Index editing   #
@@ -61,72 +61,76 @@ class AlnIndex:
         fname = AlnIndex.get_fname(chr_name, data_config)
         logging.info("Generating AUX index: %s" % fname)
         aux_index = AlnIndex(chr_name, data_config)
+        n_reads = 0
         for read in io.bam_iter(data_config.bam, 0, chr_name, bx_tag=False):
             aux_index.add(read, data_config)
+            n_reads += 1
         aux_index.select_intervals()
-        aux_index.free_unused_bins()
+        aux_index.free_unused_mem()
         aux_index.store(fname)
+        logging.info("Processed %d reads" % n_reads)
         return aux_index
 
     def add(self, read, config):
         # 1. update the index bins
         for signal in self.signal_set:
-            self.add_by_signal(read, signal, config.signal_mapq)
+            self.add_by_signal(read, signal, constants.get_read_pair_type(read))
 
         # 2. collect the read pair information for interval selection
         if self.is_valid_interval_read(read):
             # get the interval pairs to which each read in the pair maps
             interval_ids_read = self.get_interval_ids(self.get_read_bin_pos(read))
             interval_ids_mate = self.get_interval_ids(self.get_mate_bin_pos(read))
+            #print(abs(read.pos - read.next_reference_start), read.pos, read.next_reference_start, self.get_read_bin_pos(read), self.get_mate_bin_pos(read), interval_ids_read, interval_ids_mate)
             for i, j in itertools.product(interval_ids_read, interval_ids_mate):
-                self.interval_pair_support[sorted((i, j))] += 1
+                self.interval_pair_support[tuple(sorted((i, j)))] += 1
 
     def select_intervals(self):
-        for interval_pair, count in self.interval_pair_support:
+        for interval_pair in sorted(self.interval_pair_support.keys()):
+            count = self.interval_pair_support[interval_pair]
             # a read pair contributes to the count twice
-            if count // 2 >= self.config.min_pair_support:
+            count //= 2 
+            if count >= self.config.min_pair_support:
                 self.intervals.add(interval_pair[0])
                 self.intervals.add(interval_pair[1])
                 self.interval_pairs.append(interval_pair)
+        logging.info("Selected %d intervals" % len(self.intervals))
+        logging.info("Selected %d interval pairs out of %d pairs" % (len(self.interval_pairs), len(self.interval_pair_support)))
 
-    def free_unused_bins(self):
+    def free_unused_mem(self):
         # we only need the data for selected intervals
         last_bin_id = 0
+        n_freed = 0
         for interval_id in sorted(self.intervals):
             bin_id_start, bin_id_end = self.get_bin_range(interval_id)
             for bin_id in range(last_bin_id, bin_id_start):
                 for signal in self.signal_set:
                     if signal not in constants.SV_SIGNAL_SCALAR:
                         self.bins[signal][bin_id] = None
+                        n_freed +=1
             last_bin_id = bin_id_end
+        logging.info("Freed %d bins" % n_freed)
+        self.intervals = None
+        self.interval_pair_support = None
 
-    def add_by_signal(self, read, signal, min_clipped_len=10):
-        if signal not in self.bins or not self.is_valid_index_read(read, signal, self.config.signal_mapq):
+    def add_by_signal(self, read, signal, rp_type, min_clipped_len=10):
+        if signal not in self.bins or not self.is_valid_index_read(read, signal):
             return
         bin_id = self.get_bin_id(self.get_read_bin_pos(read))
-        assert len(self.bins[signal]) > bin_id, "%d %d %d" % (read.pos, bin_id, len(self.bins[signal]))
-
         if signal in constants.SV_SIGNAL_SCALAR:
-            if signal == SVSignals.RD_CLIPPED:
-                if (read.cigartuples[0][0] in [4, 5] and read.cigartuples[0][1] > min_clipped_len) or \
-                        (read.cigartuples[-1][0] in [4, 5] and read.cigartuples[-1][1] > min_clipped_len):
-                    # soft (op 4) or hard clipped (op 5)
-                    # TODO(viq): expose min clipped length param
-                    self.bins[signal][bin_id] += 1
-            else:
-                self.bins[signal][bin_id] += 1
+            # soft (op 4) or hard clipped (op 5)
+            # TODO(viq): expose min clipped length param
+            if signal == SVSignals.RD_CLIPPED and not (
+               (read.cigartuples[0][0] in [4, 5] and read.cigartuples[0][1] > min_clipped_len) or \
+               (read.cigartuples[-1][0] in [4, 5] and read.cigartuples[-1][1] > min_clipped_len)):
+                return
+            self.bins[signal][bin_id] += 1
         else:
-            if signal == SVSignals.SM and read.has_tag('BX'):
-                barcode = read.get_tag('BX')
-                if isinstance(barcode, str):
-                    barcode = utils.seq_to_num(barcode)
-                self.bins[SVSignals.SM][bin_id].add(barcode)
-            else:
-                if signal in constants.SV_SIGNAL_PAIRED:
-                    rp_type = constants.get_read_pair_type(read)
-                    if (signal == SVSignals.LLRR and rp_type == constants.SV_SIGNAL_RP_TYPE.LLRR) or \
-                            (signal == SVSignals.RL and rp_type == constants.SV_SIGNAL_RP_TYPE.RL):
-                        self.bins[signal][bin_id].add(read.qname)
+            if (signal == SVSignals.LLRR and rp_type != constants.SV_SIGNAL_RP_TYPE.LLRR) or \
+               (signal == SVSignals.RL and rp_type != constants.SV_SIGNAL_RP_TYPE.RL):
+               return
+            self.bins[signal][bin_id].add(read.qname)
+                    
 
     ###################
     #   Index utils   #
