@@ -93,8 +93,8 @@ chr_name_chunks, chr_names = seq_utils.partition_chrs(data_config.chr_names, dat
 logging.info("Running on %d CPUs/GPUs" % n_procs)
 logging.info("Chromosome lists processed by each process: " + str(chr_name_chunks))
 outputs_per_scan = []
-for interval_size in data_config.interval_size:
-    for step_size in data_config.step_size:
+for interval_size in [data_config.interval_size]:
+    for step_size in [data_config.step_size]:
         scan_id = len(outputs_per_scan)
         if not args.skip_inference:
             _ = Parallel(n_jobs=n_procs)(

@@ -63,25 +63,26 @@ class AlnIndex:
         aux_index = AlnIndex(chr_name, data_config)
         n_reads = 0
         for read in io.bam_iter(data_config.bam, 0, chr_name, bx_tag=False):
-            aux_index.add(read, data_config)
+            aux_index.add(read)
             n_reads += 1
-        aux_index.select_intervals()
-        aux_index.free_unused_mem()
+        if data_config.scan_target_intervals:
+            aux_index.select_intervals()
+            aux_index.free_unused_mem()
         aux_index.store(fname)
         logging.info("Processed %d reads" % n_reads)
         return aux_index
 
-    def add(self, read, config):
+    def add(self, read):
         # 1. update the index bins
         for signal in self.signal_set:
             self.add_by_signal(read, signal, constants.get_read_pair_type(read))
 
+        if not self.config.scan_target_intervals: return
         # 2. collect the read pair information for interval selection
         if self.is_valid_interval_read(read):
             # get the interval pairs to which each read in the pair maps
             interval_ids_read = self.get_interval_ids(self.get_read_bin_pos(read))
             interval_ids_mate = self.get_interval_ids(self.get_mate_bin_pos(read))
-            #print(abs(read.pos - read.next_reference_start), read.pos, read.next_reference_start, self.get_read_bin_pos(read), self.get_mate_bin_pos(read), interval_ids_read, interval_ids_mate)
             for i, j in itertools.product(interval_ids_read, interval_ids_mate):
                 self.interval_pair_support[tuple(sorted((i, j)))] += 1
 
@@ -159,7 +160,7 @@ class AlnIndex:
 
     def get_interval_ids(self, pos):
         start_interval_id = pos // self.config.step_size
-        intervals = [start_interval_id - i for i in range(self.steps_per_interval) if start_interval_id - i > 0]
+        intervals = [start_interval_id - i for i in range(self.steps_per_interval) if start_interval_id - i >= 0]
         return intervals
 
     def get_bin_range(self, interval_id):

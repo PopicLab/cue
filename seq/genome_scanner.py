@@ -33,13 +33,14 @@ class GenomeScanner:
         self.step_size = step_size
 
     def log_intervals(self, x, y):
-        logging.info("Interval pair: x=%d y=%d" % (x, y))
+        logging.info("Interval pair: %s x=%d y=%d" % (self.chr.name, x, y))
 
 
 class TargetIntervalScanner(GenomeScanner):
     def __init__(self, aln_index, interval_size, step_size):
         super().__init__(aln_index, interval_size, step_size)
         self.interval_pairs = aln_index.interval_pairs
+        logging.info("Number of target interval pairs: %d" % len(self.interval_pairs))
 
     def __iter__(self):
         for x_id, y_id in self.interval_pairs:
