@@ -76,7 +76,7 @@ def img_to_svs(target, data_config, chr_index):
         sv_type, zygosity = io.BedRecord.parse_sv_type_with_zyg(sv_type)
         aux = {'score': target[TargetType.scores][sv_idx].item(),
                'zygosity': zygosity}
-        if aux['score'] == 100:
+        if aux['score'] == 1:
             n_high_score_svs += 1
         sv_record = io.BedRecord(sv_type, sv_interval_pair.intervalA, sv_interval_pair.intervalB, aux)
         if filters.invalid(sv_record):

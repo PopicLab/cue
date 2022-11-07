@@ -25,41 +25,43 @@ from seq.intervals import GenomeInterval, GenomeIntervalPair
 import seq.io as io
 import logging
 
-class SVGenomeScanner:
-    def __init__(self, chr_index, interval_size, step_size=None, shift_size=None, blacklist_bed=None,
-                 include_chrs=None, exclude_chrs=None):
-        self.chr_index = chr_index
-        self.blacklist = None if blacklist_bed is None else io.GenomeBlacklist(blacklist_bed)
-        self.chromosomes = self.chr_index.contigs()
+
+class GenomeScanner:
+    def __init__(self, aln_index, interval_size, step_size):
+        self.chr = aln_index.chr
         self.interval_size = interval_size
-        self.step_size = interval_size if step_size is None else step_size
-        self.shifts = shift_size if shift_size is not None else [0]
-        self.min_interval_len = 1000
-        self.include_chrs = include_chrs  # None: include all chromosomes
-        self.exclude_chrs = exclude_chrs if exclude_chrs is not None else []
+        self.step_size = step_size
+
+    def log_intervals(self, x, y):
+        logging.info("Interval pair: %s x=%d y=%d" % (self.chr.name, x, y))
+
+
+class TargetIntervalScanner(GenomeScanner):
+    def __init__(self, aln_index, interval_size, step_size):
+        super().__init__(aln_index, interval_size, step_size)
+        self.interval_pairs = aln_index.interval_pairs
+        logging.info("Number of target interval pairs: %d" % len(self.interval_pairs))
 
     def __iter__(self):
-        for chr in self.chr_index.contigs():
-            if chr.name in self.exclude_chrs or (self.include_chrs is not None and chr.name not in self.include_chrs):
-                continue
-            current_pos = 0
-            while current_pos < chr.len:
-                interval = GenomeInterval(chr.name, current_pos, min(current_pos + self.interval_size, chr.len))
-                logging.info("Interval: %s" % str(interval))
-                if current_pos and current_pos % 1000000 == 0:
-                    logging.info("Scanned %d loci on %s" % (current_pos, chr.name))
-                next_gap = self.blacklist.next_gap_overlap(interval) if self.blacklist is not None else None
-                # trim interval if overlapping a blacklist region
-                if next_gap is not None:
-                    interval.end = next_gap.start
-                # check if this is a valid interval
-                if len(interval) >= self.min_interval_len:
-                    for shift in self.shifts:
-                        shift_pos = current_pos + shift
-                        if shift_pos + self.interval_size <= chr.len:  # todo: boundary
-                            interval_shifted = GenomeInterval(chr.name, shift_pos, min(shift_pos + self.interval_size,
-                                                                                       chr.len))
-                            yield GenomeIntervalPair(interval, interval_shifted)
-                # next interval to start at the end of the overlapping gap
-                current_pos = current_pos + self.step_size if next_gap is None else next_gap.end
+        for x_id, y_id in self.interval_pairs:
+            x = x_id * self.step_size
+            y = y_id * self.step_size
+            if x + self.interval_size > self.chr.len or y + self.interval_size > self.chr.len: continue 
+            self.log_intervals(x, y)           
+            yield GenomeIntervalPair(GenomeInterval(self.chr.name, x, x + self.interval_size),
+                                     GenomeInterval(self.chr.name, y, y + self.interval_size))
 
+class SlidingWindowScanner(GenomeScanner):
+    def __init__(self, aln_index, interval_size, step_size, shift_size=None):
+        super().__init__(aln_index, interval_size, step_size)
+        self.shifts = shift_size if shift_size is not None else [0]
+
+    def __iter__(self):
+        for x in range(0, self.chr.len, self.step_size):
+            if x + self.interval_size > self.chr.len: continue
+            interval_x = GenomeInterval(self.chr.name, x, x + self.interval_size)
+            for shift in self.shifts:
+                y = x + shift
+                if y + self.interval_size > self.chr.len: continue
+                self.log_intervals(x, y)
+                yield GenomeIntervalPair(interval_x, GenomeInterval(self.chr.name, y, y + self.interval_size))

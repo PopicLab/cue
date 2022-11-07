@@ -36,7 +36,7 @@ import img.utils as utils
 import seq.io as io
 import torch
 import logging
-from seq.genome_scanner import SVGenomeScanner
+from seq.genome_scanner import TargetIntervalScanner, SlidingWindowScanner
 from img.constants import TargetType
 import math
 import itertools
@@ -152,9 +152,9 @@ class SVStreamingDataset(IterableDataset):
         return target
 
     def get_genome_iterator(self):
-        return SVGenomeScanner(self.aln_index.chr_index, self.interval_size, self.step_size,
-                               shift_size=self.config.shift_size, include_chrs=self.include_chrs,
-                               exclude_chrs=self.exclude_chrs)
+        if self.config.scan_target_intervals:
+            return TargetIntervalScanner(self.aln_index, self.config.interval_size, self.config.step_size)
+        return SlidingWindowScanner(self.aln_index, self.interval_size, self.step_size, shift_size=self.config.shift_size)
 
     def make_image(self, interval_pair):
         # generate the heatmaps for each signal channel
