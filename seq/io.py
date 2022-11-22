@@ -297,7 +297,8 @@ def filter_read(read, min_mapq, bx_tag=True, am_tag=False):
            (read.has_tag('AM') and am_tag and read.get_tag('AM') != '1')
 
 def bam_iter(bam_fname, min_mapq, chr_name=None, bx_tag=True, am_tag=False):
-    input_bam = pysam.AlignmentFile(bam_fname, "rb")
+    file_mode = "rc" if bam_fname.endswith('cram') else "rb"
+    input_bam = pysam.AlignmentFile(bam_fname, file_mode)
     n_filtered_reads = 0
     n_reads = 0
     for i, read in enumerate(input_bam.fetch(chr_name)):
