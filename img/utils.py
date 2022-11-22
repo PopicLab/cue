@@ -24,8 +24,7 @@ def downscale_tensor(image, to_image_dim, target=None):
     ratio = image.shape[1] / to_image_dim
     if target is not None:
         target = downscale_target(target, ratio)
-    return F.interpolate(image.unsqueeze(0), size=(to_image_dim, to_image_dim),
-                         recompute_scale_factor=True).squeeze(0), target
+    return F.interpolate(image.unsqueeze(0), size=(to_image_dim, to_image_dim)).squeeze(0), target
 
 
 def downscale_image(image, to_image_dim, target=None):
@@ -77,7 +76,7 @@ def img_to_svs(target, data_config, chr_index):
         sv_type, zygosity = io.BedRecord.parse_sv_type_with_zyg(sv_type)
         aux = {'score': target[TargetType.scores][sv_idx].item(),
                'zygosity': zygosity}
-        if aux['score'] == 100:
+        if aux['score'] == 1:
             n_high_score_svs += 1
         sv_record = io.BedRecord(sv_type, sv_interval_pair.intervalA, sv_interval_pair.intervalB, aux)
         if filters.invalid(sv_record):

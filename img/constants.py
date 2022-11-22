@@ -87,9 +87,19 @@ SV_SIGNAL_SET_CHANNEL_IDX = {
     SV_SIGNAL_SET.LINKED: {SV_SIGNAL_SET.LINKED: range(len(SV_SIGNALS_BY_TYPE[SV_SIGNAL_SET.LINKED]))}
     }
 
-SV_SIGNAL_RP_TYPE = Enum("SV_SIGNAL_RP_TYPE", 'LLRR '
-                                              'RL '
-                                              'LR ')
+# Read-pair types
+SV_SIGNAL_RP_TYPE = Enum("SV_SIGNAL_RP_TYPE", 'LR LLRR RL')
+
+def get_read_pair_type(read, rl_dist_thr=5):
+    # TODO: if one of the reads in the pair is ambiguously mapped, can't infer the correct orientation
+    if read.is_reverse == read.mate_is_reverse:
+        return SV_SIGNAL_RP_TYPE.LLRR
+    if ((read.reference_start + rl_dist_thr) < read.next_reference_start and read.is_read2 and read.is_reverse) or \
+            (read.reference_start > (read.next_reference_start + rl_dist_thr) and read.is_read1 and not read.is_reverse):
+        # read pairs in R2F1 orientation TODO: add support for R1F2
+        return SV_SIGNAL_RP_TYPE.RL
+    return SV_SIGNAL_RP_TYPE.LR  # normally paired reads (LR orientation)
+
 
 # Image classes
 SV_CLASS_SET = Enum("SV_CLASS_SET", 'BASIC4 '

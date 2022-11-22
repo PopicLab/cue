@@ -1,5 +1,7 @@
 dataset_dirs: ["/path/to/imageset"]
 gpu_ids: [0]
+logging_level: "INFO"
+n_jobs_per_gpu: 1
 pretrained_model: null
 signal_set: "SHORT"
 signal_set_origin: "SHORT"
@@ -13,6 +15,7 @@ learning_rate: 0.0001
 learning_rate_decay_interval: 5
 learning_rate_decay_factor: 1
 report_interval: 50
+model_checkpoint_interval: 10000
 plot_confidence_maps: False
 validation_ratio: 0.1
 sigma: 10

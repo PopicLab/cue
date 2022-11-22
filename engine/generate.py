@@ -39,12 +39,12 @@ args = parser.parse_args()
 # -----------------
 
 def generate(chr_names):
+    logging.root.setLevel(logging.INFO)
     # generates images/annotations for the specified list of chromosomes
     for chr_name in chr_names:
-        aln_index = AlnIndex.generate_or_load_chr(config.bam, chr_name, config.fai, config.bin_size, config.signal_mapq,
-                                                  config.signal_set, config.signal_set_origin, config.bam_type)
-        dataset = datasets.SVStreamingDataset(config, config.interval_size[0], config.step_size[0], allow_empty=True,
-                                              store=True, include_chrs=[chr_name], aln_index=aln_index)
+        aln_index = AlnIndex.generate_or_load(chr_name, config)
+        dataset = datasets.SVStreamingDataset(config, config.interval_size[0], config.step_size[0], allow_empty=config.allow_empty,
+                                              store=config.store_img, include_chrs=[chr_name], aln_index=aln_index, remove_annotation=config.empty_annotation)
         chr_stats = DatasetStats("%s/%s" % (config.info_dir, chr_name), classes=config.classes)
         for _, target in dataset:
             chr_stats.update(target)
