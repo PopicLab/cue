@@ -83,8 +83,13 @@ class AlnIndex:
             # get the interval pairs to which each read in the pair maps
             interval_ids_read = self.get_interval_ids(self.get_read_bin_pos(read))
             interval_ids_mate = self.get_interval_ids(self.get_mate_bin_pos(read))
-            for i, j in itertools.product(interval_ids_read, interval_ids_mate):
-                self.interval_pair_support[tuple(sorted((i, j)))] += 1
+            # if the pair falls into the same interval(s), add support only for such interval(s)
+            if abs(max(interval_ids_read) - max(interval_ids_mate)) < self.steps_per_interval:
+                for interval_id_shared in sorted(set(interval_ids_read).intersection(interval_ids_mate)):
+                    self.interval_pair_support[(interval_id_shared, interval_id_shared)] += 1
+            else:
+                for i, j in itertools.product(interval_ids_read, interval_ids_mate):
+                    self.interval_pair_support[tuple(sorted((i, j)))] += 1
 
     def select_intervals(self):
         for interval_pair in sorted(self.interval_pair_support.keys()):
@@ -149,7 +154,8 @@ class AlnIndex:
 
     def is_valid_interval_read(self, read):
         # read pair must be mapped to the same chromosome
-        if read.is_unmapped or read.mate_is_unmapped or read.next_reference_name != read.reference_name:
+        if read.is_unmapped or read.mate_is_unmapped or not read.is_paired or \
+           read.is_secondary or read.mapping_quality == 0 or read.next_reference_name != read.reference_name:
             return False
         # read pair distance must be within the configured range
         return self.config.min_pair_distance <= \
