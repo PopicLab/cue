@@ -41,7 +41,7 @@ def view(chr_names):
     for chr_name in chr_names:
         aln_index = AlnIndex.generate_or_load(chr_name, config)
         logging.info("Generating SV images for %s" % chr_name)
-        dataset = datasets.SVBedScanner(config, config.interval_size[0], allow_empty=False, store=True,
+        dataset = datasets.SVBedScanner(config, config.interval_size, allow_empty=False, store=True,
                                         include_chrs=[chr_name], aln_index=aln_index)
         for _, target in dataset:
             continue
