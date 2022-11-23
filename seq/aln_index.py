@@ -195,14 +195,15 @@ class AlnIndex:
     #   Index lookup ops   #
     ########################
 
-    def intersect(self, signal, interval_a, interval_b):
+    def intersect(self, signal, interval_a, interval_b, off_diagonal_only):
         signal_bins = self.bins[signal]
         counts, start_bin_id_a, start_bin_id_b = self.initialize_grid(interval_a, interval_b)
         for i in range(counts.shape[0]):
             for j in range(counts.shape[1]):
                 bin_a = i + start_bin_id_a
                 bin_b = j + start_bin_id_b
-                if signal not in [SVSignals.LLRR, SVSignals.RL] or bin_a != bin_b:
+                if not signal_bins[bin_a] or not signal_bins[bin_b]: continue
+                if not off_diagonal_only or bin_a != bin_b:
                     counts[i][j] = len(signal_bins[bin_a].intersection(signal_bins[bin_b]))
         return counts
 
