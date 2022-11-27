@@ -183,7 +183,7 @@ class SVStreamingDataset(IterableDataset):
                         counts[np.isnan(counts)] = 0
                 else:
                     counts = self.aln_index.intersect(signal, interval_pair.intervalA, interval_pair.intervalB,
-                                                      signal in [SVSignals.LLRR, SVSignals.RL])
+                                                      signal in [constants.SVSignals.LLRR, constants.SVSignals.RL])
                 vmin = 0
             total_counts += np.sum(counts)
             if self.view_mode:
