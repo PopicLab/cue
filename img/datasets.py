@@ -36,7 +36,7 @@ import img.utils as utils
 import seq.io as io
 import torch
 import logging
-from seq.genome_scanner import SVGenomeScanner
+from seq.genome_scanner import TargetIntervalScanner, SlidingWindowScanner
 from img.constants import TargetType
 import math
 import itertools
@@ -46,7 +46,7 @@ from scipy.ndimage import convolve
 class SVStreamingDataset(IterableDataset):
     def __init__(self, config, interval_size, step_size=None, include_chrs=None, exclude_chrs=None,
                  allow_empty=False, store=False, aln_index=None, view_mode=False,
-                 generate_empty=False, convert_to_empty=False):
+                 generate_empty=False, convert_to_empty=False, remove_annotation=False):
         super().__init__()
         self.config = config
         self.interval_size = interval_size
@@ -62,6 +62,7 @@ class SVStreamingDataset(IterableDataset):
         self.apply_filters = False
         self.aln_index = aln_index
         self.annotate = config.bed is not None
+        self.remove_annotation = remove_annotation
         self.ground_truth = io.BedRecordContainer(config.bed) if self.annotate else None
         self.transform = transforms.Compose([transforms.ToTensor()])  # TODO(viq): normalize
         self.signal_set = config.signal_set
@@ -109,7 +110,7 @@ class SVStreamingDataset(IterableDataset):
                     sv_keypoints.append([x_max, y_max, (x_max < self.config.heatmap_dim
                                                         and y_max < self.config.heatmap_dim)])
                 keypoints.append(sv_keypoints)
-                logging.debug("%s: [%d %d %d %d], [%d %d %d %d], %s %s" % (record, x_min, x_max, y_min, y_max,
+                logging.info("%s: [%d %d %d %d], [%d %d %d %d], %s %s" % (record, x_min, x_max, y_min, y_max,
                                                                         box_x_min, box_x_max, box_y_min, box_y_max,
                                                                         record.get_sv_type(), record.get_sv_type_with_zyg()))
                 logging.debug(keypoints)
@@ -151,9 +152,9 @@ class SVStreamingDataset(IterableDataset):
         return target
 
     def get_genome_iterator(self):
-        return SVGenomeScanner(self.aln_index.chr_index, self.interval_size, self.step_size,
-                               shift_size=self.config.shift_size, include_chrs=self.include_chrs,
-                               exclude_chrs=self.exclude_chrs)
+        if self.config.scan_target_intervals:
+            return TargetIntervalScanner(self.aln_index, self.config.interval_size, self.config.step_size)
+        return SlidingWindowScanner(self.aln_index, self.interval_size, self.step_size, shift_size=self.config.shift_size)
 
     def make_image(self, interval_pair):
         # generate the heatmaps for each signal channel
@@ -176,12 +177,13 @@ class SVStreamingDataset(IterableDataset):
                         counts = (llrr_counts + nbr_counts) / (rd_counts + nbr_counts)
                     else:
                         if np.sum(rd_counts) > 0:
-                            counts = (llrr_counts) / (llrr_counts + rd_counts)
+                            counts = llrr_counts / (llrr_counts + rd_counts)
                         else:
                             counts = llrr_counts
                         counts[np.isnan(counts)] = 0
                 else:
-                    counts = self.aln_index.intersect(signal, interval_pair.intervalA, interval_pair.intervalB)
+                    counts = self.aln_index.intersect(signal, interval_pair.intervalA, interval_pair.intervalB,
+                                                      signal in [constants.SVSignals.LLRR, constants.SVSignals.RL])
                 vmin = 0
             total_counts += np.sum(counts)
             if self.view_mode:
@@ -227,6 +229,8 @@ class SVStreamingDataset(IterableDataset):
                     continue
                 if self.store:
                     self.save_image(image, idx, interval_pair)
+                    if self.remove_annotation:
+                        target = None 
                     torch.save(target, self.config.annotation_dir + "%s_%d_%s.target" % (self.config.uid, idx,
                                                                                          str(interval_pair)))
                     # debug
@@ -268,7 +272,7 @@ class SVStaticDataset(Dataset):
         self.dataset_id = dataset_id
 
     def __len__(self):
-        return min(len(self.images[0]), 200000)
+        return min(len(self.images[0]), 1000000)
 
     def __getitem__(self, index):
         image = []
@@ -336,8 +340,7 @@ class SVKeypointDataset(SVStreamingDataset):
             annotations = [fn for fn in os.listdir(annotation_dir) if "%s_" % chr_name in fn]
             if len(annotations) == 0:
                 continue
-            self.aln_index = AlnIndex.load_chr(self.config.bam, self.config.bin_size, chr_name,
-                                                   self.config.signal_set_origin)
+            self.aln_index = AlnIndex.load(AlnIndex.get_fname(chr_name, self.config))
             for ann_fname in annotations:
                 ann_path = os.path.join(annotation_dir, ann_fname)
                 annotation = torch.load(ann_path)

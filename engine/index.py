@@ -13,8 +13,7 @@ args = parser.parse_args()
 
 def index(chr_names):
     for chr_name in chr_names:
-        AlnIndex.generate_or_load_chr(config.bam, chr_name, config.fai, config.bin_size, config.signal_mapq,
-                                      config.signal_set, config.signal_set_origin, config.bam_type)
+        AlnIndex.generate_or_load(chr_name, config)
     return True
 
 

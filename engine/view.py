@@ -39,15 +39,14 @@ args = parser.parse_args()
 
 def view(chr_names):
     for chr_name in chr_names:
-        aln_index = AlnIndex.generate_or_load_chr(config.bam, chr_name, config.fai, config.bin_size,
-                                                  config.signal_mapq, config.signal_set, config.signal_set_origin,
-                                                  config.bam_type)
+        aln_index = AlnIndex.generate_or_load(chr_name, config)
         logging.info("Generating SV images for %s" % chr_name)
-        dataset = datasets.SVBedScanner(config, config.interval_size[0], allow_empty=False, store=True,
+        dataset = datasets.SVBedScanner(config, config.interval_size, allow_empty=False, store=True,
                                         include_chrs=[chr_name], aln_index=aln_index)
         for _, target in dataset:
             continue
     return True
+
 
 config = config_utils.load_config(args.config, config_type=config_utils.CONFIG_TYPE.DATA)
 chr_name_chunks, _ = utils.partition_chrs(config.chr_names, config.fai, config.n_cpus)

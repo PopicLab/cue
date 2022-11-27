@@ -1,21 +1,28 @@
 #### REQUIRED ####
-bam: "../data/demo/inputs/chr21.small.bam"  # path to the alignments BAM file
+bam: "../data/demo/inputs/chr21.small.bam"  # path to the alignments file (BAM or CRAM format)
 fai: "../data/demo/inputs/GRCh38.fa.fai"  # path to the referene FASTA FAI file
 #### OPTIONAL ####
 n_cpus: 1  # number of CPUs to use (parallelized by chromosome)
 chr_names: ["chr21"]  # list of chromosomes to process: null (all) or a specific list e.g. ["chr1", "chr21"]
+logging_level: "INFO"  # verbosity level (set to "ERROR" to reduce logging volume)
+min_qual_score: 50  # minimum SV confidence/quality score to output
 #### FIXED (do not modify) ####
 bam_type: "SHORT"
+min_sv_len: 4000
 signal_set: "SHORT"
 signal_set_origin: "SHORT"
-bed: null
-blacklist_bed: null
 signal_vmax: {"RD": 600, "RD_LOW": 800, "RD_CLIPPED": 600, "SM": 200, "SR_RP": 600, "LR": 600, "LLRR": 100, "RL": 100, "LLRR_VS_LR": 1}
 signal_mapq: {"RD": 20, "RD_LOW": 0, "RD_CLIPPED": 20, "SM": 20, "SR_RP": 0, "LR": 0, "LLRR": 1, "RL": 1, "LLRR_VS_LR": 1}
+blacklist_bed: null
+bed: null
 bin_size: 750
-interval_size: [150000]
-step_size: [50000]
-shift_size: [0, 70000, 140000]
+interval_size: 150000
+step_size: 50000
+shift_size: null
+min_pair_support: 2
+min_pair_distance: 4000
+max_pair_distance: 1000000
+scan_target_intervals: True
 heatmap_dim: 1000
 image_dim: 256
 class_set: "BASIC5ZYG"
