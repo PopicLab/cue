@@ -43,7 +43,7 @@ def generate(chr_names):
     # generates images/annotations for the specified list of chromosomes
     for chr_name in chr_names:
         aln_index = AlnIndex.generate_or_load(chr_name, config)
-        dataset = datasets.SVStreamingDataset(config, config.interval_size[0], config.step_size[0], allow_empty=config.allow_empty,
+        dataset = datasets.SVStreamingDataset(config, config.interval_size, config.step_size, allow_empty=config.allow_empty,
                                               store=config.store_img, include_chrs=[chr_name], aln_index=aln_index, remove_annotation=config.empty_annotation)
         chr_stats = DatasetStats("%s/%s" % (config.info_dir, chr_name), classes=config.classes)
         for _, target in dataset:

@@ -71,12 +71,12 @@ In addition to the functionality to call structural variants, the framework can 
 custom model training, evaluation, and image generation. The ```engine``` directory contains the following 
 key high-level scripts to train/evaluate the model and generate image datasets:
 
-* ```call.py```: calls structural variants given a pre-trained model and an input BAM file 
+* ```call.py```: calls structural variants given a pre-trained model and an input BAM/CRAM file 
 (can be executed on multiple GPUs or CPUs)
 * ```train.py```: trains a deep learning model (currently, this is a stacked hourglass network architecture) 
 to detect SV keypoints in images
-* ```generate.py```: creates an annotated image dataset from alignments (BAM file(s))
-* ```view.py```: plots images annotated with SVs from a VCF/BED file given genome alignments (BAM format);
+* ```generate.py```: creates an annotated image dataset from alignments (BAM/CRAM file(s))
+* ```view.py```: plots images annotated with SVs from a VCF/BED file given genome alignments (BAM/CRAM format);
 can be used to visualize model predictions or ground truth SVs 
 
 Each script accepts as input one or multiple YAML config files, which encode a variety of parameters. 
@@ -85,7 +85,7 @@ Template config files are provided in the ```config``` directory.
 The key required and optional YAML parameters for each Cue command are listed below.
 
 ```call.py``` (data YAML):
-* ```bam``` [*required*] path to the alignments BAM file
+* ```bam``` [*required*] path to the alignments file (BAM/CRAM format)
 * ```fai``` [*required*] path to the referene FASTA FAI file
 * ```n_cpus```  [*optional*] number of CPUs to use for calling (parallelized by chromosome)
 * ```chr_names``` [*optional*] list of chromosomes to process: null (all) or a specific list e.g. ["chr1", "chr21"]
@@ -100,14 +100,14 @@ The key required and optional YAML parameters for each Cue command are listed be
 * ```report_interval``` [*optional*] frequency (in number of batches) for reporting training stats and image predictions
 
 ```generate.py```:
-* ```bam``` [*required*] path to the alignments BAM file
+* ```bam``` [*required*] path to the alignments file (BAM/CRAM format)
 * ```bed``` [*required*] path to the ground truth BED or VCF file
 * ```fai``` [*required*] path to the referene FASTA FAI file
 * ```n_cpus```  [*optional*] number of CPUs to use for image generation (parallelized by chromosome)
 * ```chr_names``` [*optional*] list of chromosomes to process: null (all) or a specific list e.g. ["chr1", "chr21"]
 
 ```view.py```:
-* ```bam``` [*required*] path to the alignments BAM file
+* ```bam``` [*required*] path to the alignments file (BAM/CRAM format)
 * ```bed``` [*required*] path to the BED or VCF file with SVs to visualize
 * ```fai``` [*required*] path to the reference FASTA FAI file
 * ```n_cpus```  [*optional*] number of CPUs (parallelized by chromosome)

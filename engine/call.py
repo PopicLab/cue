@@ -154,9 +154,10 @@ if refine_config is not None and refine_config.pretrained_model is not None:
     for chr_name in chr_names:
         chr_sv_calls = io.bed2sv_calls("%s/svs.%s.bed" % (config.report_dir, chr_name))
         sv_calls.extend(chr_sv_calls)
+    candidate_out_bed_file = "%s/candidate_svs_refined.bed" % config.report_dir
+    io.write_bed(candidate_out_bed_file, sv_calls)
 
 # ------ IO ------
-# write SV calls to file (bed and vcf)
-out_bed_file = "%s/svs.bed" % config.report_dir
-io.write_bed(out_bed_file, sv_calls)
-io.bed2vcf(out_bed_file, "%s/svs.vcf" % config.report_dir, data_config.fai)
+# write SV calls to file (bed and vcf
+io.bed2vcf(candidate_out_bed_file, "%s/svs.vcf" % config.report_dir, data_config.fai, 
+           min_score=data_config.min_qual_score, min_len=data_config.min_sv_len)
