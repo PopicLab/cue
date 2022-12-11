@@ -57,10 +57,11 @@ from Cue's capsule in CodeOcean.
 
 #### Download the latest pre-trained Cue model
 
-The latest pre-trained Cue model can be downloaded from Google Cloud Storage (GCS): [latest](https://storage.googleapis.com/cue-models/latest/cue.pt)
-All the models are stored in the following [GCS bucket](https://console.cloud.google.com/storage/browser/cue-models). 
+The latest pre-trained Cue model can be downloaded from Google Cloud Storage (GCS): [latest model] (https://storage.googleapis.com/cue-models/latest/cue.v2.pt).  
 
-Files can be downloaded from GCS using [gsutil](https://cloud.google.com/storage/docs/gsutil).
+All the models are stored in the following public [GCS bucket](https://console.cloud.google.com/storage/browser/cue-models).  
+ 
+Files can be downloaded from GCS using [gsutil](https://cloud.google.com/storage/docs/gsutil).  
 
 <a name="demo"></a>
 ### Tutorial
@@ -68,8 +69,8 @@ Files can be downloaded from GCS using [gsutil](https://cloud.google.com/storage
 We recommend trying the provided demo Jupyter [notebook](notebooks/tutorial.ipynb) to ensure that the software 
 was properly installed and to experiment running Cue. For convenience, Jupyter was already included in the installation 
 requirements above, or can be installed separately from [here](http://jupyter.org/install).
-In this demo we use Cue to discover variants in a small BAM file provided here: ```data/demo/inputs/chr21.small.bam``` 
-(with the associated YAML config files needed to execute this workflow provided in the ```data/demo/config``` directory).
+In this demo we use Cue to discover variants in a small BAM file (with the associated YAML config files needed to execute 
+this workflow provided in the ```data/demo/config``` directory).
 
 <a name="guide"></a>
 ### User guide
