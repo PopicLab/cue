@@ -9,6 +9,7 @@ allow_empty: False
 empty_annotation: False
 #### FIXED ####
 scan_target_intervals: False
+stream: False
 store_img: True
 bam_type: "SHORT"
 signal_set: "SHORT"

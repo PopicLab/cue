@@ -8,6 +8,7 @@ chr_names: ["chr21"]  # list of chromosomes to process: null (all) or a specific
 logging_level: "INFO"  # verbosity level (set to "ERROR" to reduce logging volume)
 #### FIXED (do not modify) ####
 scan_target_intervals: False
+stream: False
 bam_type: "SHORT"
 signal_set: "SHORT"
 signal_set_origin: "SHORT"
