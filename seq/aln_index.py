@@ -219,10 +219,9 @@ class AlnIndex:
         return np.zeros((n_bins_a, n_bins_b)), start_bin_id_a, start_bin_id_b
 
     def clear_bin_sets(self, start_bin_id, end_bin_id):
-        for bin_id in range(start_bin_id, end_bin_id):
-            for signal in self.signal_set:
-                if signal not in constants.SV_SIGNAL_SCALAR:
-                    self.bins[signal][bin_id] = None    
+        for signal in self.signal_set:
+            if signal not in constants.SV_SIGNAL_SCALAR:
+                self.bins[signal][start_bin_id:end_bin_id] = [None] * (end_bin_id - start_bin_id) 
 
     ########################
     #   Index lookup ops   #
