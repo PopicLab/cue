@@ -48,13 +48,11 @@ class AlnIndex:
             else:
                 self.bins[signal] = [set() for _ in range(self.n_bins)]
         logging.info("Number of bins: %d" % self.n_bins)
-        # interval selection 
         if self.config.scan_target_intervals:
             self.interval_pair_support = defaultdict(int)  # stores the number of discordant pairs across the two intervals
             self.intervals = set()
             self.interval_pairs = []
             self.steps_per_interval = self.config.interval_size // self.config.step_size
-        # streaming
         if self.config.stream:
             assert self.config.scan_target_intervals, "Streaming is only supported when scan_target_intervals=True"
             self.stream_handle = None
@@ -280,7 +278,6 @@ class AlnIndex:
             free_block_id += 1
 
     def load_stream(self, block_id):
-        # load any new bins for this interval
         load_block_id = 0 if self.last_read_block_id is None else self.last_read_block_id + 1
         while load_block_id <= block_id:
             self.last_read_block_id = load_block_id
