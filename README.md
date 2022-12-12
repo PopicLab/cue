@@ -57,7 +57,7 @@ from Cue's capsule in CodeOcean.
 
 #### Download the latest pre-trained Cue model
 
-The latest pre-trained Cue model can be downloaded from this [here](https://storage.googleapis.com/cue-models/latest/cue.v2.pt).  
+The latest pre-trained Cue model can be downloaded from this [link](https://storage.googleapis.com/cue-models/latest/cue.v2.pt).  
 
 All the models are stored in the following public [Google Cloud Storage bucket](https://console.cloud.google.com/storage/browser/cue-models). Files can be viewed/downloaded using [gsutil](https://cloud.google.com/storage/docs/gsutil) or directly from the browser using the [Google Cloud console](https://cloud.google.com/storage/docs/cloud-console).  
 
