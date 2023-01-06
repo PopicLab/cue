@@ -55,14 +55,21 @@ To deactivate the environment: ```$> deactivate```
 Alternatively, Cue can be installed using the```Dockerfile``` provided in the ```install/docker``` directory 
 from Cue's capsule in CodeOcean.
 
+#### Download the latest pre-trained Cue model
+
+The latest pre-trained Cue model can be downloaded from this [link](https://storage.googleapis.com/cue-models/latest/cue.v2.pt).  
+
+All the models are stored in the following public [Google Cloud Storage bucket](https://console.cloud.google.com/storage/browser/cue-models). Synthetic datasets are available in the public [Google Cloud Storage datasets bucket](https://console.cloud.google.com/storage/browser/cue-synth-datasets). Files can be viewed/downloaded using [gsutil](https://cloud.google.com/storage/docs/gsutil) or directly from the browser using the [Google Cloud console](https://cloud.google.com/storage/docs/cloud-console).  
+
+
 <a name="demo"></a>
 ### Tutorial
 
 We recommend trying the provided demo Jupyter [notebook](notebooks/tutorial.ipynb) to ensure that the software 
 was properly installed and to experiment running Cue. For convenience, Jupyter was already included in the installation 
 requirements above, or can be installed separately from [here](http://jupyter.org/install).
-In this demo we use Cue to discover variants in a small BAM file provided here: ```data/demo/inputs/chr21.small.bam``` 
-(with the associated YAML config files needed to execute this workflow provided in the ```data/demo/config``` directory).
+In this demo we use Cue to discover variants in a small BAM file (with the associated YAML config files needed to execute 
+this workflow provided in the ```data/demo/config``` directory).
 
 <a name="guide"></a>
 ### User guide

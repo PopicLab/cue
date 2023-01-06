@@ -1,5 +1,5 @@
 #### REQUIRED ####
-model_path: "../data/models/cue.pt"  # path to the pretrained Cue model
+model_path: "../data/demo/models/cue.pt"  # path to the pretrained Cue model
 #### OPTIONAL ####
 gpu_ids: []  # list of GPU ids to use for calling -- a CPU will be used if empty
 n_jobs_per_gpu: 1 # how many parallel jobs to launch on the same GPU
