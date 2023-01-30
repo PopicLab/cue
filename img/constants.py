@@ -53,6 +53,8 @@ SV_SIGNAL_SCALAR = {SVSignals.RD, SVSignals.RD_LOW, SVSignals.RD_CLIPPED,
                     RefSignals.RD, RefSignals.RD_LOW, RefSignals.RD_CLIPPED}
 SV_SIGNAL_PAIRED = {SVSignals.LLRR, SVSignals.RL}
 
+SV_SIGNAL_INDEX = {SVSignals.RD, SVSignals.RD_LOW, SVSignals.RD_CLIPPED, SVSignals.LLRR, SVSignals.RL, SVSignals.SR_RP}
+
 def to_ref_signal(signal):
     mapping = {SVSignals.RD: RefSignals.RD,
                SVSignals.RD_LOW: RefSignals.RD_LOW,

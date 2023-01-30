@@ -49,6 +49,7 @@ class AlnIndex:
                 self.bins[signal] = [set() for _ in range(self.n_bins)]
         logging.info("Number of bins: %d" % self.n_bins)
         if self.config.scan_target_intervals:
+            self.valid_interval_reads = set()
             self.interval_pair_support = defaultdict(int)  # stores the number of discordant pairs across the two intervals
             self.intervals = set()
             self.interval_pairs = []
@@ -72,7 +73,7 @@ class AlnIndex:
         if data_config.stream:
             aux_index.open_stream_handle('wb')
         n_reads = 0
-        for read in io.bam_iter(data_config.bam, 0, chr_name, bx_tag=False):
+        for read in io.bam_iter(data_config.bam, chr_name):
             aux_index.add(read)
             n_reads += 1
         if data_config.scan_target_intervals:
@@ -87,11 +88,13 @@ class AlnIndex:
         bin_id = self.get_bin_id(self.get_read_bin_pos(read))
         rp_type = constants.get_read_pair_type(read)
         for signal in self.signal_set:
-            self.add_by_signal(read, signal, bin_id, rp_type)
+            if signal in constants.SV_SIGNAL_INDEX:
+                self.add_by_signal(read, signal, bin_id, rp_type)
 
         if not self.config.scan_target_intervals: return
         # 2. collect the read pair information for interval selection
-        if self.is_valid_interval_read(read):
+        if self.is_valid_interval_read(read) and read.qname not in self.valid_interval_reads:
+            self.valid_interval_reads.add(read.qname)
             # get the interval pairs to which each read in the pair maps
             interval_ids_read = self.get_interval_ids(self.get_read_bin_pos(read))
             interval_ids_mate = self.get_interval_ids(self.get_mate_bin_pos(read))
@@ -113,8 +116,6 @@ class AlnIndex:
     def select_intervals(self):
         for interval_pair in sorted(self.interval_pair_support.keys()):
             count = self.interval_pair_support[interval_pair]
-            # a read pair contributes to the count twice
-            count //= 2 
             if count >= self.config.min_pair_support:
                 self.intervals.add(interval_pair[0])
                 self.intervals.add(interval_pair[1])
