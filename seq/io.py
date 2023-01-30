@@ -290,13 +290,7 @@ class GenomeBlacklist:
         return self.chr2tree[sv_record.intervalA.chr_name].overlaps(start, end)
 
 
-def filter_read(read, min_mapq, bx_tag=True, am_tag=False):
-    return read.is_unmapped or \
-           read.mapping_quality < min_mapq or \
-           (not read.has_tag('BX') and bx_tag) or \
-           (read.has_tag('AM') and am_tag and read.get_tag('AM') != '1')
-
-def bam_iter(bam_fname, min_mapq, chr_name=None, bx_tag=True, am_tag=False):
+def bam_iter(bam_fname, chr_name=None, read_filters=None):
     file_mode = "rc" if bam_fname.endswith('cram') else "rb"
     input_bam = pysam.AlignmentFile(bam_fname, file_mode)
     n_filtered_reads = 0
@@ -305,13 +299,21 @@ def bam_iter(bam_fname, min_mapq, chr_name=None, bx_tag=True, am_tag=False):
         n_reads += 1
         if i % 1000000 == 0:
             print("Processed %d reads" % i)
-        if filter_read(read, min_mapq, bx_tag, am_tag):
+        if read_filters and any([f(read) for f in read_filters]):
             n_filtered_reads += 1
             continue
         yield read
     print("Read: %d reads" % n_reads)
     print("Filtered: %d reads" % n_filtered_reads)
+    input_bam.close()
 
+
+def bam_iter_interval(bam_fname, chr_name, start, end):
+    file_mode = "rc" if bam_fname.endswith('cram') else "rb"
+    input_bam = pysam.AlignmentFile(bam_fname, file_mode)
+    for read in input_bam.fetch(chr_name, start, end):
+        yield read
+    input_bam.close()
 
 def get_vcf_format_variant_file(vcf_fname, contigs, ctg_no_len=False):
     with open(vcf_fname, "w") as vcf:
