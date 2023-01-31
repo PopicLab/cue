@@ -25,6 +25,11 @@ max_pair_distance: 1000000
 scan_target_intervals: True
 bins_per_block: 8000
 stream: True
+min_refine_buffer: 2000
+refine_buffer_frac_size: 5
+refine_pair_dist_frac_size: 2
+refine_bp_kernels: [0, 50, 500]
+refine_min_support: 2
 heatmap_dim: 1000
 image_dim: 256
 class_set: "BASIC5ZYG"

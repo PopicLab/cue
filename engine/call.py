@@ -23,6 +23,7 @@
 import engine.config_utils as config_utils
 import engine.core as engine
 import argparse
+from collections import defaultdict
 from torch.utils.data import DataLoader
 import torch
 import models.cue_net as models
@@ -30,12 +31,14 @@ import logging
 import seq.io as io
 import img.datasets as datasets
 from img.refinery import SVKeypointRefinery
+import seq.refinery
 from img.datasets import SVStreamingDataset
 import img.utils as utils
 import seq.filters as sv_filters
 from seq.aln_index import AlnIndex
 from joblib import Parallel, delayed
 import seq.utils as seq_utils
+import os
 from pathlib import Path
 import warnings
 warnings.filterwarnings("ignore")
@@ -85,7 +88,7 @@ def call(device, chr_names, uid):
 
 # ------ Image-based discovery ------
 n_procs = len(config.devices)
-if not n_procs:  # temp workaround when no GPUs are available
+if not n_procs:  # CPU-only
     n_procs = data_config.n_cpus
     for _ in range(n_procs):
         config.devices.append(torch.device("cpu"))
@@ -124,8 +127,14 @@ sv_calls = candidates_per_scan[0]
 for i in range(1, len(candidates_per_scan)):
     sv_calls = sv_filters.merge_sv_candidates(sv_calls, candidates_per_scan[i])
 
+# output candidate SVs (pre-refinement)
 candidate_out_bed_file = "%s/candidate_svs.bed" % config.report_dir
 io.write_bed(candidate_out_bed_file, sv_calls)
+chr2calls = defaultdict(list)
+for sv in sv_calls:
+    chr2calls[sv.intervalA.chr_name].append(sv)
+for chr_name in chr_names:
+    io.write_bed("%s/candidate_svs.%s.bed" % (config.report_dir, chr_name), chr2calls[chr_name])
 
 # ------ NN-aided breakpoint refinement ------
 if refine_config is not None and refine_config.pretrained_model is not None:
@@ -135,29 +144,35 @@ if refine_config is not None and refine_config.pretrained_model is not None:
         refinet.to(device)
         refinet.eval()
         refinery = SVKeypointRefinery(refinet, device, refine_config.padding, refine_config.image_dim)
-        sv_calls = io.bed2sv_calls(candidate_out_bed_file)
         for chr_name in chr_names:
             refinery.bam_index = AlnIndex.generate_or_load(chr_name, refine_config)
             refinery.image_generator = SVStreamingDataset(refine_config, interval_size=None, store=False,
                                                           allow_empty=True, aln_index=refinery.bam_index)
-            chr_calls = []
-            for sv_call in sv_calls:
-                if sv_call.intervalA.chr_name == chr_name:
-                    refinery.refine_call(sv_call)
-                    chr_calls.append(sv_call)
-            chr_out_bed_file = "%s/svs.%s.bed" % (config.report_dir, chr_name)
+            chr_calls = io.bed2sv_calls("%s/candidate_svs.%s.bed" % (config.report_dir, chr_name))
+            for sv_call in chr_calls:
+                refinery.refine_call(sv_call)
+            chr_out_bed_file = "%s/refined_svs.%s.bed" % (config.report_dir, chr_name)
             io.write_bed(chr_out_bed_file, chr_calls)
-        return True
-    refine(config.devices[0], chr_names)
+    Parallel(n_jobs=n_procs)(delayed(refine)(chr_name_chunks[i]) for i in range(n_procs))
+else: # ------ Genome-based breakpoint refinement ------
+    def refine(chr_names):
+        for chr_name in chr_names:
+            chr_calls = io.bed2sv_calls("%s/candidate_svs.%s.bed" % (config.report_dir, chr_name)) 
+            os.remove("%s/candidate_svs.%s.bed" % (config.report_dir, chr_name))
+            chr_calls = seq.refinery.refine_svs(chr_calls, data_config, chr_index)
+            io.write_bed("%s/refined_svs.%s.bed" % (config.report_dir, chr_name), chr_calls)
+    Parallel(n_jobs=n_procs)(delayed(refine)(chr_name_chunks[i]) for i in range(n_procs))
+    
 
-    sv_calls = []
-    for chr_name in chr_names:
-        chr_sv_calls = io.bed2sv_calls("%s/svs.%s.bed" % (config.report_dir, chr_name))
-        sv_calls.extend(chr_sv_calls)
-    candidate_out_bed_file = "%s/candidate_svs_refined.bed" % config.report_dir
-    io.write_bed(candidate_out_bed_file, sv_calls)
+# output candidate SVs (post-refinement)
+sv_calls_refined = []
+for chr_name in chr_names:
+    sv_calls_refined.extend(io.bed2sv_calls("%s/refined_svs.%s.bed" % (config.report_dir, chr_name)))
+    os.remove("%s/refined_svs.%s.bed" % (config.report_dir, chr_name))
+candidate_out_bed_file = "%s/refined_svs.bed" % config.report_dir
+io.write_bed(candidate_out_bed_file, sv_calls_refined)
 
 # ------ IO ------
-# write SV calls to file (bed and vcf
-io.bed2vcf(candidate_out_bed_file, "%s/svs.vcf" % config.report_dir, data_config.fai, 
-           min_score=data_config.min_qual_score, min_len=data_config.min_sv_len)
+# write SV calls to file
+io.bed2vcf(candidate_out_bed_file, "%s/svs.vcf" % config.report_dir, data_config.fai,
+                   min_score=data_config.min_qual_score, min_len=data_config.min_sv_len)
