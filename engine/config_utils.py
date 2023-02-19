@@ -73,18 +73,37 @@ class Config:
         self.n_signals = len(constants.SV_SIGNALS_BY_TYPE[self.signal_set]) 
         logging.info(self)
 
+    
+    def set_defaults(self):
+        default_values = {
+            'gpu_ids': [], 
+            'batch_size': 16,
+            'logging_level': "INFO",
+            'report_interval': 50,
+            'n_jobs_per_gpu': 1,
+            'signal_set': "SHORT",
+            'class_set': "BASIC5ZYG",
+            'num_keypoints': 1,
+            'model_architecture': "HG",
+            'image_dim': 256,
+            'sigma': 10,
+	    'stride': 4,
+	    'heatmap_peak_threshold': 0.4
+        }
+        for k, v, in default_values.items():
+            if not hasattr(self, k):
+                self.__setattr__(k, v)
+
     def __str__(self):
-        s = " ===== Config ====="
-        s += "\n\tYAML config file: " + self.config_file
-        s += "\n\tExperiment directory: " + self.experiment_dir
-        s += "\n\tDevice: " + str(self.device)
-        s += "\n\tMain LOG file: " + str(self.log_file) + "\n\t"
+        s = "==== Config ====\n\t"
+        s += '\n\t'.join("{}: {}".format(k, v) for k, v in self.__dict__.items())
         return s
 
 
 class TrainingConfig(Config):
     def __init__(self, config_file, **entries):
         self.__dict__.update(entries)
+        self.set_defaults()
         super().__init__(config_file)
         self.image_dirs = [dataset_dir + "/images/" for dataset_dir in self.dataset_dirs]
         self.annotation_dirs = [dataset_dir + "/annotations/" for dataset_dir in self.dataset_dirs]
@@ -96,25 +115,50 @@ class TrainingConfig(Config):
             self.epoch_dirs.append(output_dir)
 
     def __str__(self):
-        s = super().__str__()
+        s = " ===== Training config =====\n\t"
         s += '\n\t'.join("{}: {}".format(k, v) for k, v in self.__dict__.items())
         return s
+
+    def set_defaults(self):
+        super().set_defaults()
+        default_values = {
+	    'model_checkpoint_interval': 10000,
+	    'plot_confidence_maps': False,
+	    'validation_ratio': 0.1,
+	    'signal_set_origin': "SHORT",
+	    'learning_rate': 0.0001,
+            'learning_rate_decay_interval': 5,
+	    'learning_rate_decay_factor': 1
+	}
+        for k, v, in default_values.items():
+            if not hasattr(self, k):
+                self.__setattr__(k, v)
 
 
 class TestConfig(Config):
     def __init__(self, config_file, **entries):
         self.__dict__.update(entries)
+        self.set_defaults()
         super().__init__(config_file)
 
     def __str__(self):
-        s = super().__str__()
+        s = " ========== Model config ==========\n\t"
         s += '\n\t'.join("{}: {}".format(k, v) for k, v in self.__dict__.items())
         return s
 
+    def set_defaults(self):
+        super().set_defaults()
+        default_values = {
+            'pretrained_refinenn_path': None,
+        }
+        for k, v, in default_values.items():
+            if not hasattr(self, k):
+                self.__setattr__(k, v)
 
 class DatasetConfig:
     def __init__(self, config_file, **entries):
         self.__dict__.update(entries)
+        self.set_defaults()
         self.config_file = config_file
         self.dataset_dir = str(Path(config_file).parent.resolve())
         self.info_dir = self.dataset_dir + "/info/"
@@ -145,8 +189,51 @@ class DatasetConfig:
                             handlers=[logging.FileHandler(self.log_file, mode='w'), logging.StreamHandler(sys.stdout)])
         logging.info(self)
 
+    def set_defaults(self):
+        default_values = {
+            'n_cpus': 1,
+            'chr_names': None,
+            'logging_level': "INFO",
+            'min_refine_buffer': 2000,
+            'refine_buffer_frac_size': 5,
+            'refine_pair_dist_frac_size': 2,
+            'refine_bp_kernels': [0, 50, 500],
+            'refine_min_support': 2,
+            'min_pair_support': 2,
+            'min_pair_distance': 4000,
+            'max_pair_distance': 1000000,
+            'scan_target_intervals': True,
+            'stream': True,
+            'view_mode': False,
+            'store_image': False,
+            'bins_per_block': 8000,
+            'min_sv_len': 4000,
+            'min_qual_score': 50,
+            'bam_type': "SHORT",
+            'signal_set': "SHORT",
+            'signal_set_origin': "SHORT",
+            'bed': None,
+            'blacklist_bed': None,
+            'signal_vmax': {"RD": 600, "RD_LOW": 800, "RD_CLIPPED": 600, "SM": 200, "SR_RP": 600, "LR": 600, "LLRR": 100,
+                          "RL": 100, "LLRR_VS_LR": 1},
+            'signal_mapq': {"RD": 20, "RD_LOW": 0, "RD_CLIPPED": 20, "SM": 20, "SR_RP": 0, "LR": 0, "LLRR": 1, "RL": 1,
+                          "LLRR_VS_LR": 1},
+            'bin_size': 750,
+            'interval_size': 150000,
+            'step_size': 50000,
+            'shift_size': None,
+            'heatmap_dim': 1000,
+            'image_dim': 256,
+            'class_set': "BASIC5ZYG",
+            'num_keypoints': 1,
+            'bbox_padding': 0
+        }
+        for k, v, in default_values.items():
+            if not hasattr(self, k):
+                self.__setattr__(k, v) 
+
     def __str__(self):
-        s = "==== Dataset ====\n"
+        s = "========== Data config =========\n\t"
         s += '\n\t'.join("{}: {}".format(k, v) for k, v in self.__dict__.items())
         return s
 
@@ -163,5 +250,6 @@ def load_config(fname, config_type=CONFIG_TYPE.TRAIN):
         return TestConfig(fname, **config)
     else:
         return DatasetConfig(fname, **config)
+
 
 

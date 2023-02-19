@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 import engine.config_utils as config_utils
-import engine.core as engine
+import engine
 import argparse
 from collections import defaultdict
 from torch.utils.data import DataLoader
@@ -42,6 +42,10 @@ import os
 from pathlib import Path
 import warnings
 warnings.filterwarnings("ignore")
+
+print("*********************************")
+print("*  cue (%s): discovery mode *" % engine.__version__)
+print("*********************************")
 
 
 # ------ CLI ------
@@ -79,7 +83,7 @@ def call(device, chr_names, uid):
         data_loader = DataLoader(dataset=dataset, batch_size=config.batch_size, shuffle=False,
                                  collate_fn=datasets.collate_fn)
         logging.info("Generating SV predictions for %s" % chr_name)
-        predictions = engine.evaluate(model, data_loader, config, device, output_dir=predictions_dir,
+        predictions = engine.core.evaluate(model, data_loader, config, device, output_dir=predictions_dir,
                                       collect_data_metrics=True, given_ground_truth=given_ground_truth)
         torch.save(predictions, "%s/predictions.pkl" % predictions_dir)
     return True
