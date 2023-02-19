@@ -1,18 +1,6 @@
 #### REQUIRED ####
 model_path: "/path/to/model"  # path to the pretrained Cue model
 #### OPTIONAL ####
-gpu_ids: []  # list of GPU ids to use for calling -- a CPU will be used if empty
+gpu_ids: []  # list of GPU ids to use for calling (default: CPU(s) will be used if empty)
 n_jobs_per_gpu: 1 # how many parallel jobs to launch on the same GPU
-report_interval: 10  # frequency (in number of batches) for reporting training stats and image predictions
-pretrained_refinenn_path: null  # path to the pretrained keypoint refinement model
-logging_level: "INFO"  # verbosity level (set to "ERROR" to reduce logging volume)  
-#### FIXED (do not modify) ####
-image_dim: 256
-class_set: "BASIC5ZYG"
-signal_set: "SHORT"
-num_keypoints: 1
-model_architecture: "HG"
-batch_size: 16
-sigma: 10
-stride: 4
-heatmap_peak_threshold: 0.4
+n_cpus: 1  # number of CPUs to use for calling if no GPUs are listed

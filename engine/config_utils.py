@@ -42,13 +42,13 @@ class Config:
         self.config_file = config_file
         self.experiment_dir = str(Path(config_file).parent.resolve())
         self.devices = []
-        if len(self.gpu_ids) > 0:
+        if len(self.gpu_ids) > 0 and torch.cuda.is_available():
             os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(map(str, self.gpu_ids))
-        if torch.cuda.is_available():
             for i in range(self.n_jobs_per_gpu*len(self.gpu_ids)):
                 self.devices.append(torch.device("cuda:%d" % int(i/self.n_jobs_per_gpu)))
         else:
-            self.devices.append(torch.device("cpu"))
+            for _ in range(self.n_cpus):
+                self.devices.append(torch.device("cpu"))
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.tb_dir = self.experiment_dir + "/tb/"
         self.log_dir = self.experiment_dir + "/logs/"
@@ -77,6 +77,7 @@ class Config:
     def set_defaults(self):
         default_values = {
             'gpu_ids': [], 
+            'n_cpus': 1,
             'batch_size': 16,
             'logging_level': "INFO",
             'report_interval': 50,
