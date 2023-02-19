@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 
+import engine
 import engine.config_utils as config_utils
 import argparse
 import img.datasets as datasets
@@ -31,6 +32,10 @@ import seq.utils as utils
 from joblib import Parallel, delayed
 import os
 import torch
+
+print("*********************************")
+print("*  cue (%s): image-gen mode *" % engine.__version__)
+print("*********************************")
 
 # ------ CLI ------
 parser = argparse.ArgumentParser(description='Generate an SV image dataset')
