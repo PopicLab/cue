@@ -91,7 +91,9 @@ to detect SV keypoints in images
 can be used to visualize model predictions or ground truth SVs 
 
 Each script accepts as input one or multiple YAML config files, which encode a variety of parameters. 
-Template config files are provided in the ```config``` directory.
+Template config files with key parameters are provided in the ```config``` directory. 
+The ```config/custom``` directory contains template config files with additional parameters that 
+can be useful when generating custom models. 
 
 The key required and optional YAML parameters for each Cue command are listed below.
 
@@ -109,7 +111,7 @@ The key required and optional YAML parameters for each Cue command are listed be
 ```train.py```:
 * ```dataset_dirs``` [*required*] list of annotated imagesets to use for training
 * ```gpu_ids```  [*optional*] GPU id to use for training -- a CPU will be used if empty
-* ```report_interval``` [*optional*] frequency (in number of batches) for reporting training stats and image predictions (default: 
+* ```report_interval``` [*optional*] frequency (in number of batches) for reporting training stats and image predictions (default: 50)
 
 ```generate.py```:
 * ```bam``` [*required*] path to the alignments file (BAM/CRAM format)
