@@ -59,8 +59,12 @@ from Cue's capsule in CodeOcean.
 
 The latest pre-trained Cue model can be downloaded from this [link](https://storage.googleapis.com/cue-models/latest/cue.v2.pt).  
 
-All the models are stored in the following public [Google Cloud Storage bucket](https://console.cloud.google.com/storage/browser/cue-models). Synthetic datasets are available in the public [Google Cloud Storage datasets bucket](https://console.cloud.google.com/storage/browser/cue-synth-datasets). Files can be viewed/downloaded using [gsutil](https://cloud.google.com/storage/docs/gsutil) or directly from the browser using the [Google Cloud console](https://cloud.google.com/storage/docs/cloud-console).  
+To download the latest model into the data/models directory:
 
+```wget --directory-prefix=data/models/ https://storage.googleapis.com/cue-models/latest/cue.v2.pt```
+
+
+All the models are stored in the following public [Google Cloud Storage bucket](https://console.cloud.google.com/storage/browser/cue-models). Synthetic datasets are available in the public [Google Cloud Storage datasets bucket](https://console.cloud.google.com/storage/browser/cue-synth-datasets). Files can be viewed/downloaded using [gsutil](https://cloud.google.com/storage/docs/gsutil) or directly from the browser using the [Google Cloud console](https://cloud.google.com/storage/docs/cloud-console).  
 
 <a name="demo"></a>
 ### Tutorial
@@ -87,38 +91,41 @@ to detect SV keypoints in images
 can be used to visualize model predictions or ground truth SVs 
 
 Each script accepts as input one or multiple YAML config files, which encode a variety of parameters. 
-Template config files are provided in the ```config``` directory.
+Template config files with key parameters are provided in the ```config``` directory. 
+The ```config/custom``` directory contains template config files with additional parameters that 
+can be useful when generating custom models. 
 
 The key required and optional YAML parameters for each Cue command are listed below.
 
 ```call.py``` (data YAML):
 * ```bam``` [*required*] path to the alignments file (BAM/CRAM format)
 * ```fai``` [*required*] path to the referene FASTA FAI file
-* ```n_cpus```  [*optional*] number of CPUs to use for calling (parallelized by chromosome)
-* ```chr_names``` [*optional*] list of chromosomes to process: null (all) or a specific list e.g. ["chr1", "chr21"]
+* ```chr_names``` [*optional*] list of chromosomes to process: null (all) or a specific list e.g. ["chr1", "chr21"] (default: null)
 
 ```call.py``` (model YAML):
-* ```model_path``` [*required*] path to the pretrained Cue model
-* ```gpu_ids``` [*optional*] list of GPU ids to use for calling -- CPU(s) will be used if empty
+* ```model_path``` [*required*] path to the pretrained Cue model (recommended: the latest available model)
+* ```gpu_ids``` [*optional*] list of GPU ids to use for calling (default: CPU(s) will be used if empty)
+* ```n_jobs_per_gpu``` [*optional*] number of parallel jobs to launch on the same GPU (default: 1)
+* ```n_cpus```  [*optional*] number of CPUs to use for calling if no GPUs are listed (default: 1)
 
 ```train.py```:
 * ```dataset_dirs``` [*required*] list of annotated imagesets to use for training
 * ```gpu_ids```  [*optional*] GPU id to use for training -- a CPU will be used if empty
-* ```report_interval``` [*optional*] frequency (in number of batches) for reporting training stats and image predictions
+* ```report_interval``` [*optional*] frequency (in number of batches) for reporting training stats and image predictions (default: 50)
 
 ```generate.py```:
 * ```bam``` [*required*] path to the alignments file (BAM/CRAM format)
 * ```bed``` [*required*] path to the ground truth BED or VCF file
 * ```fai``` [*required*] path to the referene FASTA FAI file
-* ```n_cpus```  [*optional*] number of CPUs to use for image generation (parallelized by chromosome)
-* ```chr_names``` [*optional*] list of chromosomes to process: null (all) or a specific list e.g. ["chr1", "chr21"]
+* ```n_cpus```  [*optional*] number of CPUs to use for image generation (parallelized by chromosome) (default: 1)
+* ```chr_names``` [*optional*] list of chromosomes to process: null (all) or a specific list e.g. ["chr1", "chr21"] (default: null)
 
 ```view.py```:
 * ```bam``` [*required*] path to the alignments file (BAM/CRAM format)
 * ```bed``` [*required*] path to the BED or VCF file with SVs to visualize
 * ```fai``` [*required*] path to the reference FASTA FAI file
-* ```n_cpus```  [*optional*] number of CPUs (parallelized by chromosome)
-* ```chr_names``` [*optional*] list of chromosomes to process: null (all) or a specific list e.g. ["chr1", "chr21"]
+* ```n_cpus```  [*optional*] number of CPUs (parallelized by chromosome) (default: 1)
+* ```chr_names``` [*optional*] list of chromosomes to process: null (all) or a specific list e.g. ["chr1", "chr21"] (default: null)
 
 <a name="workflow"></a>
 #### Recommended workflow 

@@ -21,7 +21,8 @@
 # SOFTWARE.
 
 import engine.config_utils as config_utils
-import engine.core as engine
+import engine
+import engine.core as core
 import argparse
 from collections import defaultdict
 from torch.utils.data import DataLoader
@@ -43,6 +44,10 @@ from pathlib import Path
 import warnings
 warnings.filterwarnings("ignore")
 
+print("*********************************")
+print("*  cue (%s): discovery mode *" % engine.__version__)
+print("*********************************")
+
 
 # ------ CLI ------
 parser = argparse.ArgumentParser(description='SV calling functionality')
@@ -59,6 +64,7 @@ refine_config = None
 if args.refine_config is not None:
     refine_config = config_utils.load_config(args.refine_config)
 given_ground_truth = data_config.bed is not None  # (benchmarking mode)
+
 
 def call(device, chr_names, uid):
     # runs SV calling on the specified device for the specified list of chromosomes
@@ -79,19 +85,14 @@ def call(device, chr_names, uid):
         data_loader = DataLoader(dataset=dataset, batch_size=config.batch_size, shuffle=False,
                                  collate_fn=datasets.collate_fn)
         logging.info("Generating SV predictions for %s" % chr_name)
-        predictions = engine.evaluate(model, data_loader, config, device, output_dir=predictions_dir,
+        predictions = core.evaluate(model, data_loader, config, device, output_dir=predictions_dir,
                                       collect_data_metrics=True, given_ground_truth=given_ground_truth)
         torch.save(predictions, "%s/predictions.pkl" % predictions_dir)
     return True
 
 
-
 # ------ Image-based discovery ------
 n_procs = len(config.devices)
-if not n_procs:  # CPU-only
-    n_procs = data_config.n_cpus
-    for _ in range(n_procs):
-        config.devices.append(torch.device("cpu"))
 chr_name_chunks, chr_names = seq_utils.partition_chrs(data_config.chr_names, data_config.fai, n_procs)
 logging.info("Running on %d CPUs/GPUs" % n_procs)
 logging.info("Chromosome lists processed by each process: " + str(chr_name_chunks))
@@ -137,6 +138,7 @@ for chr_name in chr_names:
     io.write_bed("%s/candidate_svs.%s.bed" % (config.report_dir, chr_name), chr2calls[chr_name])
 
 # ------ NN-aided breakpoint refinement ------
+post_process_refined = False
 if refine_config is not None and refine_config.pretrained_model is not None:
     def refine(device, chr_names):
         refinet = models.CueModelConfig(refine_config).get_model()
@@ -154,7 +156,8 @@ if refine_config is not None and refine_config.pretrained_model is not None:
             chr_out_bed_file = "%s/refined_svs.%s.bed" % (config.report_dir, chr_name)
             io.write_bed(chr_out_bed_file, chr_calls)
     Parallel(n_jobs=n_procs)(delayed(refine)(chr_name_chunks[i]) for i in range(n_procs))
-else: # ------ Genome-based breakpoint refinement ------
+    post_process_refined = True
+elif not data_config.refine_disable:  # ------ Genome-based breakpoint refinement ------
     def refine(chr_names):
         for chr_name in chr_names:
             chr_calls = io.bed2sv_calls("%s/candidate_svs.%s.bed" % (config.report_dir, chr_name)) 
@@ -162,17 +165,19 @@ else: # ------ Genome-based breakpoint refinement ------
             chr_calls = seq.refinery.refine_svs(chr_calls, data_config, chr_index)
             io.write_bed("%s/refined_svs.%s.bed" % (config.report_dir, chr_name), chr_calls)
     Parallel(n_jobs=n_procs)(delayed(refine)(chr_name_chunks[i]) for i in range(n_procs))
+    post_process_refined = True
     
 
 # output candidate SVs (post-refinement)
-sv_calls_refined = []
-for chr_name in chr_names:
-    sv_calls_refined.extend(io.bed2sv_calls("%s/refined_svs.%s.bed" % (config.report_dir, chr_name)))
-    os.remove("%s/refined_svs.%s.bed" % (config.report_dir, chr_name))
-candidate_out_bed_file = "%s/refined_svs.bed" % config.report_dir
-io.write_bed(candidate_out_bed_file, sv_calls_refined)
+if post_process_refined:
+    sv_calls_refined = []
+    for chr_name in chr_names:
+        sv_calls_refined.extend(io.bed2sv_calls("%s/refined_svs.%s.bed" % (config.report_dir, chr_name)))
+        os.remove("%s/refined_svs.%s.bed" % (config.report_dir, chr_name))
+    candidate_out_bed_file = "%s/refined_svs.bed" % config.report_dir
+    io.write_bed(candidate_out_bed_file, sv_calls_refined)
 
 # ------ IO ------
 # write SV calls to file
 io.bed2vcf(candidate_out_bed_file, "%s/svs.vcf" % config.report_dir, data_config.fai,
-                   min_score=data_config.min_qual_score, min_len=data_config.min_sv_len)
+           min_score=data_config.min_qual_score, min_len=data_config.min_sv_len)

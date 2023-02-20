@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 
+import engine
 import engine.config_utils as config_utils
 import argparse
 import img.datasets as datasets
@@ -32,19 +33,26 @@ from joblib import Parallel, delayed
 import os
 import torch
 
+print("*********************************")
+print("*  cue (%s): image-gen mode *" % engine.__version__)
+print("*********************************")
+
 # ------ CLI ------
 parser = argparse.ArgumentParser(description='Generate an SV image dataset')
 parser.add_argument('--config', help='Dataset config')
 args = parser.parse_args()
 # -----------------
 
+
 def generate(chr_names):
     logging.root.setLevel(logging.INFO)
     # generates images/annotations for the specified list of chromosomes
     for chr_name in chr_names:
         aln_index = AlnIndex.generate_or_load(chr_name, config)
-        dataset = datasets.SVStreamingDataset(config, config.interval_size, config.step_size, allow_empty=config.allow_empty,
-                                              store=config.store_img, include_chrs=[chr_name], aln_index=aln_index, remove_annotation=config.empty_annotation)
+        dataset = datasets.SVStreamingDataset(config, config.interval_size, config.step_size,
+                                              allow_empty=config.allow_empty,
+                                              store=config.store_img, include_chrs=[chr_name], aln_index=aln_index,
+                                              remove_annotation=config.empty_annotation)
         chr_stats = DatasetStats("%s/%s" % (config.info_dir, chr_name), classes=config.classes)
         for _, target in dataset:
             chr_stats.update(target)

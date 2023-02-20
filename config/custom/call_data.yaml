@@ -1,0 +1,20 @@
+#### REQUIRED ####
+bam: "/path/to/bam"  # path to the alignments file (BAM/CRAM format)
+fai: "/path/to/fai"  # path to the reference FASTA FAI file
+#### OPTIONAL ####
+chr_names: null  # list of chromosomes to process: null (all) or a specific list e.g. ["chr1", "chr21"]
+logging_level: "INFO"  # verbosity level (set to "ERROR" to reduce logging volume)
+min_sv_len: 4000  # minimum length of SVs to output
+min_qual_score: 50  # minimum SV confidence/quality score to output
+blacklist_bed: null  # blacklist intervals to filter out SVs
+min_pair_support: 2  # minimum number of discordant read pairs to retain an interval pair in targeted mode
+min_pair_distance: 4000  # minimum discordant read-pair distance
+max_pair_distance: 1000000  # maximum discordant read-pair distance
+refine_disable: False  # disable SV refinement
+bin_size: 750  # size of index bins (in bps)
+interval_size: 150000  # size of genome intervals on each axis (in bps)
+step_size: 50000  # sliding-window step size in interval generation
+stream: True # set to True to enable streaming during targeted indexing (to reduce RAM requirements)
+bins_per_block: 8000  # streaming block size
+signal_vmax: {"RD": 600, "RD_LOW": 800, "RD_CLIPPED": 600, "SM": 200, "SR_RP": 600, "LR": 600, "LLRR": 100, "RL": 100, "LLRR_VS_LR": 1}
+signal_mapq: {"RD": 20, "RD_LOW": 0, "RD_CLIPPED": 20, "SM": 20, "SR_RP": 0, "LR": 0, "LLRR": 1, "RL": 1, "LLRR_VS_LR": 1}
