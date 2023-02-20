@@ -4,3 +4,5 @@ model_path: "/path/to/model"  # path to the pretrained Cue model
 gpu_ids: []  # list of GPU ids to use for calling (default: CPU(s) will be used if empty)
 n_jobs_per_gpu: 1 # how many parallel jobs to launch on the same GPU
 n_cpus: 1  # number of CPUs to use for calling if no GPUs are listed
+report_interval: 100  # frequency (in number of batches) for reporting image predictions
+batch_size: 16  # number of images per batch

@@ -9,3 +9,10 @@ logging_level: "INFO"  # verbosity level (set to "ERROR" to reduce logging volum
 report_interval: 50   # frequency (in number of batches) for reporting training stats and predictions
 model_checkpoint_interval: 10000  # how often to checkpoint the model as it trains
 validation_ratio: 0.1  # fraction of the data to use for validation
+plot_confidence_maps: False  # output the predicted confidence maps
+learning_rate: 0.0001
+learning_rate_decay_interval: 5
+learning_rate_decay_factor: 1
+sigma: 10
+stride: 4
+heatmap_peak_threshold: 0.4

@@ -31,6 +31,7 @@ import sys
 import os
 import math
 from random import randint
+
 logging.getLogger('matplotlib').setLevel(logging.ERROR)
 logging.getLogger('tensorflow').setLevel(logging.WARNING)
 
@@ -44,18 +45,17 @@ class Config:
         self.devices = []
         if len(self.gpu_ids) > 0 and torch.cuda.is_available():
             os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(map(str, self.gpu_ids))
-            for i in range(self.n_jobs_per_gpu*len(self.gpu_ids)):
-                self.devices.append(torch.device("cuda:%d" % int(i/self.n_jobs_per_gpu)))
+            for i in range(self.n_jobs_per_gpu * len(self.gpu_ids)):
+                self.devices.append(torch.device("cuda:%d" % int(i / self.n_jobs_per_gpu)))
+            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         else:
             for _ in range(self.n_cpus):
                 self.devices.append(torch.device("cpu"))
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.tb_dir = self.experiment_dir + "/tb/"
+            self.device = torch.device("cpu")
         self.log_dir = self.experiment_dir + "/logs/"
         self.report_dir = self.experiment_dir + "/reports/"
 
         # setup the experiment directory structure
-        Path(self.tb_dir).mkdir(parents=True, exist_ok=True)
         Path(self.log_dir).mkdir(parents=True, exist_ok=True)
         Path(self.report_dir).mkdir(parents=True, exist_ok=True)
 
@@ -70,13 +70,12 @@ class Config:
         self.classes = constants.SV_CLASSES[self.class_set]
         self.num_classes = len(self.classes)
         self.signal_set = constants.SV_SIGNAL_SET[self.signal_set]
-        self.n_signals = len(constants.SV_SIGNALS_BY_TYPE[self.signal_set]) 
+        self.n_signals = len(constants.SV_SIGNALS_BY_TYPE[self.signal_set])
         logging.info(self)
 
-    
     def set_defaults(self):
         default_values = {
-            'gpu_ids': [], 
+            'gpu_ids': [],
             'n_cpus': 1,
             'batch_size': 16,
             'logging_level': "INFO",
@@ -88,8 +87,8 @@ class Config:
             'model_architecture': "HG",
             'image_dim': 256,
             'sigma': 10,
-	    'stride': 4,
-	    'heatmap_peak_threshold': 0.4
+            'stride': 4,
+            'heatmap_peak_threshold': 0.4
         }
         for k, v, in default_values.items():
             if not hasattr(self, k):
@@ -123,14 +122,14 @@ class TrainingConfig(Config):
     def set_defaults(self):
         super().set_defaults()
         default_values = {
-	    'model_checkpoint_interval': 10000,
-	    'plot_confidence_maps': False,
-	    'validation_ratio': 0.1,
-	    'signal_set_origin': "SHORT",
-	    'learning_rate': 0.0001,
+            'model_checkpoint_interval': 10000,
+            'plot_confidence_maps': False,
+            'validation_ratio': 0.1,
+            'signal_set_origin': "SHORT",
+            'learning_rate': 0.0001,
             'learning_rate_decay_interval': 5,
-	    'learning_rate_decay_factor': 1
-	}
+            'learning_rate_decay_factor': 1
+        }
         for k, v, in default_values.items():
             if not hasattr(self, k):
                 self.__setattr__(k, v)
@@ -156,6 +155,7 @@ class TestConfig(Config):
             if not hasattr(self, k):
                 self.__setattr__(k, v)
 
+
 class DatasetConfig:
     def __init__(self, config_file, **entries):
         self.__dict__.update(entries)
@@ -178,7 +178,7 @@ class DatasetConfig:
         # setup the dataset directory structure
         Path(self.info_dir).mkdir(parents=True, exist_ok=True)
         Path(self.image_dir).mkdir(parents=True, exist_ok=True)
-        for i in range(math.ceil(self.num_signals/3)):
+        for i in range(math.ceil(self.num_signals / 3)):
             Path(self.image_dir + ("split%d" % i)).mkdir(parents=True, exist_ok=True)
         Path(self.annotation_dir).mkdir(parents=True, exist_ok=True)
         Path(self.annotated_images_dir).mkdir(parents=True, exist_ok=True)
@@ -200,13 +200,15 @@ class DatasetConfig:
             'refine_pair_dist_frac_size': 2,
             'refine_bp_kernels': [0, 50, 500],
             'refine_min_support': 2,
+            'refine_disable': False,
             'min_pair_support': 2,
             'min_pair_distance': 4000,
             'max_pair_distance': 1000000,
             'scan_target_intervals': True,
             'stream': True,
             'view_mode': False,
-            'store_image': False,
+            'store_img': False,
+            'empty_annotation': False,
             'bins_per_block': 8000,
             'min_sv_len': 4000,
             'min_qual_score': 50,
@@ -215,10 +217,10 @@ class DatasetConfig:
             'signal_set_origin': "SHORT",
             'bed': None,
             'blacklist_bed': None,
-            'signal_vmax': {"RD": 600, "RD_LOW": 800, "RD_CLIPPED": 600, "SM": 200, "SR_RP": 600, "LR": 600, "LLRR": 100,
-                          "RL": 100, "LLRR_VS_LR": 1},
+            'signal_vmax': {"RD": 600, "RD_LOW": 800, "RD_CLIPPED": 600, "SM": 200, "SR_RP": 600, "LR": 600,
+                            "LLRR": 100, "RL": 100, "LLRR_VS_LR": 1},
             'signal_mapq': {"RD": 20, "RD_LOW": 0, "RD_CLIPPED": 20, "SM": 20, "SR_RP": 0, "LR": 0, "LLRR": 1, "RL": 1,
-                          "LLRR_VS_LR": 1},
+                            "LLRR_VS_LR": 1},
             'bin_size': 750,
             'interval_size': 150000,
             'step_size': 50000,
@@ -231,7 +233,7 @@ class DatasetConfig:
         }
         for k, v, in default_values.items():
             if not hasattr(self, k):
-                self.__setattr__(k, v) 
+                self.__setattr__(k, v)
 
     def __str__(self):
         s = "========== Data config =========\n\t"
@@ -251,6 +253,3 @@ def load_config(fname, config_type=CONFIG_TYPE.TRAIN):
         return TestConfig(fname, **config)
     else:
         return DatasetConfig(fname, **config)
-
-
-

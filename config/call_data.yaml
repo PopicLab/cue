@@ -1,5 +1,6 @@
 #### REQUIRED ####
 bam: "/path/to/bam"  # path to the alignments file (BAM/CRAM format)
-fai: "/path/to/fai"  # path to the referene FASTA FAI file
+fai: "/path/to/fai"  # path to the reference FASTA FAI file
 #### OPTIONAL ####
 chr_names: null  # list of chromosomes to process: null (all) or a specific list e.g. ["chr1", "chr21"]
+logging_level: "INFO"  # verbosity level (set to "ERROR" to reduce logging volume)
