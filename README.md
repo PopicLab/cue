@@ -44,7 +44,7 @@ and [video](https://www.youtube.com/watch?v=EVlLqig3qEI).
 
 * Install all the required packages in the virtual environment (this should take a few minutes):  
 ```$> pip --no-cache-dir install -r install/requirements.txt```  
-Packages can also be installed individually using the recommended versions 
+Packages can also be installed individually using the versions 
 provided in the ```install/requirements.txt``` file; for example:
 ```$> pip install numpy==1.18.5```
 
@@ -52,8 +52,6 @@ provided in the ```install/requirements.txt``` file; for example:
 
 To deactivate the environment: ```$> deactivate```
 
-Alternatively, Cue can be installed using the```Dockerfile``` provided in the ```install/docker``` directory 
-from Cue's capsule in CodeOcean.
 
 #### Download the latest pre-trained Cue model
 
@@ -64,7 +62,12 @@ To download the latest model into the data/models directory:
 ```wget --directory-prefix=data/models/ https://storage.googleapis.com/cue-models/latest/cue.v2.pt```
 
 
-All the models are stored in the following public [Google Cloud Storage bucket](https://console.cloud.google.com/storage/browser/cue-models). Synthetic datasets are available in the public [Google Cloud Storage datasets bucket](https://console.cloud.google.com/storage/browser/cue-synth-datasets). Files can be viewed/downloaded using [gsutil](https://cloud.google.com/storage/docs/gsutil) or directly from the browser using the [Google Cloud console](https://cloud.google.com/storage/docs/cloud-console).  
+Pre-trained models are stored in the following public [Google Cloud Storage bucket](https://console.cloud.google.com/storage/browser/cue-models). 
+
+### Data
+
+Synthetic training and benchmark data is available in the public [Google Cloud Storage datasets bucket](https://console.cloud.google.com/storage/browser/cue-synth-datasets).  
+
 
 <a name="demo"></a>
 ### Tutorial
