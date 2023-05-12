@@ -20,6 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import matplotlib
+matplotlib.use('Agg')
 
 from img import constants
 from img.constants import TargetType
@@ -34,7 +36,6 @@ import copy
 import scipy.signal
 from scipy.ndimage.filters import maximum_filter, gaussian_filter
 from scipy.ndimage.morphology import generate_binary_structure
-
 
 def heatmap_np(overlap2D, img_size=1000, vmin=0, vmax=100, cvresize=False):
     overlap2D = overlap2D.transpose()
