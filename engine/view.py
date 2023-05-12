@@ -30,24 +30,28 @@ from joblib import Parallel, delayed
 import warnings
 warnings.filterwarnings("ignore")
 
+def main():
+    # ------ CLI ------
+    parser = argparse.ArgumentParser(description='View an SV callset')
+    parser.add_argument('--config', help='Dataset config')
+    args = parser.parse_args()
+    # -----------------
 
-# ------ CLI ------
-parser = argparse.ArgumentParser(description='View an SV callset')
-parser.add_argument('--config', help='Dataset config')
-args = parser.parse_args()
-# -----------------
-
-def view(chr_names):
-    for chr_name in chr_names:
-        aln_index = AlnIndex.generate_or_load(chr_name, config)
-        logging.info("Generating SV images for %s" % chr_name)
-        dataset = datasets.SVBedScanner(config, config.interval_size, allow_empty=False, store=True,
-                                        include_chrs=[chr_name], aln_index=aln_index)
-        for _, target in dataset:
-            continue
-    return True
+    def view(chr_names):
+        for chr_name in chr_names:
+            aln_index = AlnIndex.generate_or_load(chr_name, config)
+            logging.info("Generating SV images for %s" % chr_name)
+            dataset = datasets.SVBedScanner(config, config.interval_size, allow_empty=False, store=True,
+                                            include_chrs=[chr_name], aln_index=aln_index)
+            for _, target in dataset:
+                continue
+        return True
 
 
-config = config_utils.load_config(args.config, config_type=config_utils.CONFIG_TYPE.DATA)
-chr_name_chunks, _ = utils.partition_chrs(config.chr_names, config.fai, config.n_cpus)
-_ = Parallel(n_jobs=config.n_cpus)(delayed(view)(chr_name_chunks[i]) for i in range(config.n_cpus))
+    config = config_utils.load_config(args.config, config_type=config_utils.CONFIG_TYPE.DATA)
+    chr_name_chunks, _ = utils.partition_chrs(config.chr_names, config.fai, config.n_cpus)
+    _ = Parallel(n_jobs=config.n_cpus)(delayed(view)(chr_name_chunks[i]) for i in range(config.n_cpus))
+
+
+if __name__ == "__main__":
+    main()

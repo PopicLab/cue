@@ -34,24 +34,36 @@ and [video](https://www.youtube.com/watch?v=EVlLqig3qEI).
 * Clone the repository:
 ```git clone git@github.com:PopicLab/cue.git```
 
-#### Setup a Python virtual environment (recommended)
+* Move into the directory
+```cd cue```
+
+#### Option 1: Setup a Python virtual environment (recommended)
 
 * Create the virtual environment (in the env directory): 
-```$> python3.7 -m venv env```
+```python3.7 -m venv env```
 
 * Activate the environment:
-```$> source env/bin/activate```
+```source env/bin/activate```
 
 * Install all the required packages in the virtual environment (this should take a few minutes):  
-```$> pip --no-cache-dir install -r install/requirements.txt```  
-Packages can also be installed individually using the versions 
-provided in the ```install/requirements.txt``` file; for example:
-```$> pip install numpy==1.18.5```
+```pip --no-cache-dir install .```  
 
-* Set the ```PYTHONPATH``` as follows: ```export PYTHONPATH=${PYTHONPATH}:/path/to/cue```
+To deactivate the environment: ```deactivate```
 
-To deactivate the environment: ```$> deactivate```
+#### Option 2: Conda environment
 
+Alternatively one can create a Conda environment. Install [miniconda] if you don't have Conda.
+
+* Setup Conda environment
+```conda create -n cue python=3.7```
+
+* Activate environment
+```conda activate cue```
+
+* Install cue and all required dependancies
+```pip install .```
+
+To deactivate the environment: ```conda deactivate```
 
 #### Download the latest pre-trained Cue model
 
