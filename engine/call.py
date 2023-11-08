@@ -112,7 +112,7 @@ for interval_size in [data_config.interval_size]:
         outputs_per_scan.append(outputs)
 
 # ------ Genome-based post-processing ------
-chr_index = io.load_faidx(data_config.fai)
+chr_index = io.load_faidx(data_config.fai, all=True)
 candidates_per_scan = []
 for outputs in outputs_per_scan:
     candidates = []

@@ -36,7 +36,7 @@ import os
 
 class AlnIndex:
     def __init__(self, chr_name, config):
-        self.chr_index = io.load_faidx(config.fai)
+        self.chr_index = io.load_faidx(config.fai, all=True)
         self.chr = self.chr_index.chr_from_name(chr_name)
         self.config = config
         self.signal_set = constants.SV_SIGNALS_BY_TYPE[config.signal_set]

@@ -45,7 +45,7 @@ def heatmap_np(overlap2D, img_size=1000, vmin=0, vmax=100, cvresize=False):
         x = overlap2D.reshape(img_size, overlap2D.shape[0] // img_size, img_size, overlap2D.shape[0] // img_size).sum(3).sum(1)
     else:
         x = overlap2D.repeat(img_size//overlap2D.shape[0], axis=0).repeat(img_size//overlap2D.shape[0], axis=1)
-    x = np.clip(x, vmin, vmax).astype(np.float)
+    x = np.clip(x, vmin, vmax).astype(float)
     if vmin < 0:
         x = 0.5 + 0.5*x/vmax
     else:
@@ -158,9 +158,9 @@ def annotate(image, target, classes, display_boxes=True, display_classes=True, c
             filtered = False
             for p in points:
                 if p[2] != constants.KP_FILTERED:
-                    cv2.circle(image, (p[0], p[1]), int(image_dim/100), color=color, thickness=-thickness)
+                    cv2.circle(image, (int(p[0]), int(p[1])), int(image_dim/100), color=color, thickness=-thickness)
                 else:
-                    cv2.circle(image, (p[0], p[1]), int(image_dim/100), color=(128/255, 128/255, 128/255),
+                    cv2.circle(image, (int(p[0]), int(p[1])), int(image_dim/100), color=(128/255, 128/255, 128/255),
                                thickness=-thickness)
                     filtered = True
             if display_classes:

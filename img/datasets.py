@@ -41,6 +41,7 @@ from img.constants import TargetType
 import math
 import itertools
 from scipy.ndimage import convolve
+from sys import exit
 
 
 class SVStreamingDataset(IterableDataset):
@@ -176,8 +177,14 @@ class SVStreamingDataset(IterableDataset):
                         nbr_counts = convolve(llrr_counts, kernel, mode='constant')
                         counts = (llrr_counts + nbr_counts) / (rd_counts + nbr_counts)
                     else:
+                        
                         if np.sum(rd_counts) > 0:
-                            counts = llrr_counts / (llrr_counts + rd_counts)
+                            if not np.isfinite(llrr_counts).all() or not np.isfinite(rd_counts).all():
+                                logging.error(f"DON'T IGNORE THE WARNING!\nExiting...")
+                                exit(1)
+                            else:
+                                np.seterr(divide='ignore', invalid='ignore')
+                                counts = llrr_counts // (llrr_counts + rd_counts)
                         else:
                             counts = llrr_counts
                         counts[np.isnan(counts)] = 0
@@ -322,7 +329,7 @@ class SVBedScanner(SVStreamingDataset):
 
 class SVKeypointDataset(SVStreamingDataset):
     def __init__(self, config, include_chrs=None, exclude_chrs=None, store=False):
-        self.chr_index = io.load_faidx(config.fai)
+        self.chr_index = io.load_faidx(config.fai, all=True)
         super().__init__(config, 1, store=store, include_chrs=include_chrs, exclude_chrs=exclude_chrs,
                          generate_empty=False, convert_to_empty=False)
         self.no_empty_patches = False #True

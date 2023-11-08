@@ -11,7 +11,7 @@ def seq_to_num(seq):
 
 def partition_chrs(chr_names, fai_fname, n_chunks):
     if chr_names is None:
-        chr_index = io.load_faidx(fai_fname)
+        chr_index = io.load_faidx(fai_fname, all=True)
         chr_names = list(chr_index.chr_names())
     random.shuffle(chr_names)
     return np.array_split(np.array(list(chr_names)), n_chunks), chr_names

@@ -323,7 +323,8 @@ def get_vcf_format_variant_file(vcf_fname, contigs, ctg_no_len=False):
                 vcf.write("##contig=<ID=%s,length=%d>\n" % (ctg.name, ctg.len))
             else:
                 vcf.write("##contig=<ID=%s>\n" % ctg.name)
-        vcf.write("#%s\n" % "\t".join(["CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO", "FORMAT"]))
+        # vcf.write("#%s\n" % "\t".join(["CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO", "FORMAT"]))
+        vcf.write("#%s\n" % "\t".join(["CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO"]))
     vcf_file = VariantFile(vcf_fname)
     # SV fields
     vcf_file.header.info.add('END', number=1, type='Integer', description="End position of the variant "
@@ -356,7 +357,7 @@ def bed2sv_calls(bedpe_file, bed_file_type=BED_FILE_TYPE.BEDPE):
 
 
 def bed2vcf(bedpe_file, vcf_fname, fai_fname, bed_file_type=BED_FILE_TYPE.BEDPE, sv_types=None, min_score=None, min_len=0):
-    chr_index = load_faidx(fai_fname)
+    chr_index = load_faidx(fai_fname, all=True)
     vcf_format_file = get_vcf_format_variant_file(vcf_fname + ".format", chr_index.contigs())
     vcf_out_file = VariantFile(vcf_fname, 'w', header=vcf_format_file.header)
     for record in bed_iter(bedpe_file, bed_file_type):
