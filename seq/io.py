@@ -323,7 +323,7 @@ def get_vcf_format_variant_file(vcf_fname, contigs, ctg_no_len=False):
                 vcf.write("##contig=<ID=%s,length=%d>\n" % (ctg.name, ctg.len))
             else:
                 vcf.write("##contig=<ID=%s>\n" % ctg.name)
-        vcf.write("#%s\n" % "\t".join(["CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO", "FORMAT"]))
+        vcf.write("#%s\n" % "\t".join(["CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER", "INFO"]))
     vcf_file = VariantFile(vcf_fname)
     # SV fields
     vcf_file.header.info.add('END', number=1, type='Integer', description="End position of the variant "
@@ -377,7 +377,7 @@ def bed2vcf(bedpe_file, vcf_fname, fai_fname, bed_file_type=BED_FILE_TYPE.BEDPE,
         if min_score is not None and qual < min_score:
             continue
         vcf_record = vcf_format_file.header.new_record(contig=str(record.intervalA.chr_name),
-                                                       start=start,
+                                                       start=start - 1,  # pysam expects a 0-based start
                                                        stop=stop,
                                                        alleles=['N', record.get_sv_type(to_vcf_format=True)],
                                                        id=record.sv_type,
@@ -387,6 +387,7 @@ def bed2vcf(bedpe_file, vcf_fname, fai_fname, bed_file_type=BED_FILE_TYPE.BEDPE,
                                                        samples=[{'GT': zygosity}])
         vcf_out_file.write(vcf_record)
     vcf_out_file.close()
+    vcf_format_file.close()
     os.remove(vcf_fname + ".format")
 
 
